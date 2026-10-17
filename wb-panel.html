@@ -1,351 +1,400 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="zh-CN" data-theme="light">
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>WorkBuddy 网关 · 新版面板稿</title>
+<title>WorkBuddy 网关 · 控制台</title>
 <style>
+/* ============ 主题变量 ============ */
 :root{
-  --bg:#f4f3f0; --panel:rgba(255,255,255,.72); --panel2:rgba(255,255,255,.55);
-  --line:rgba(0,0,0,.07); --line2:rgba(0,0,0,.045);
-  --fg:#1d1d1f; --sub:#86868b; --sub2:#aeaeb2;
-  --blue:#0071e3; --green:#34c759; --orange:#ff9500; --red:#ff3b30; --purple:#af52de;
+  --bg:#f3f2ef; --card:rgba(255,255,255,.74); --card2:rgba(255,255,255,.52);
+  --line:rgba(0,0,0,.08); --line2:rgba(0,0,0,.05);
+  --fg:#1d1d1f; --fg2:#3a3a3c; --sub:#7c7c80; --sub2:#a9a9ad;
+  --blue:#0071e3; --blue-bg:rgba(0,113,227,.09);
+  --green:#248a3d; --green-s:#34c759; --green-bg:rgba(52,199,89,.11);
+  --orange:#b25000; --orange-s:#ff9500; --orange-bg:rgba(255,149,0,.12);
+  --red:#d70015; --red-bg:rgba(255,59,48,.1);
   --r:16px; --r2:11px;
   --mono:ui-monospace,SFMono-Regular,"Cascadia Mono",Consolas,monospace;
+  --shadow:0 1px 2px rgba(0,0,0,.03),0 10px 28px rgba(0,0,0,.05);
+  --glow:radial-gradient(900px 420px at 10% -8%, rgba(0,113,227,.07), transparent 62%),
+         radial-gradient(760px 360px at 94% 2%, rgba(175,82,222,.05), transparent 60%),
+         radial-gradient(700px 340px at 50% 108%, rgba(52,199,89,.05), transparent 62%);
 }
+[data-theme="dark"]{
+  --bg:#1b1b1d; --card:rgba(38,38,41,.78); --card2:rgba(44,44,48,.6);
+  --line:rgba(255,255,255,.09); --line2:rgba(255,255,255,.06);
+  --fg:#f2f2f4; --fg2:#d8d8dc; --sub:#98989e; --sub2:#6e6e74;
+  --blue:#3b9bff; --blue-bg:rgba(59,155,255,.14);
+  --green:#3ddc6a; --green-s:#34c759; --green-bg:rgba(52,199,89,.15);
+  --orange:#ffab2e; --orange-s:#ff9500; --orange-bg:rgba(255,149,0,.16);
+  --red:#ff5f57; --red-bg:rgba(255,95,87,.15);
+  --shadow:0 1px 2px rgba(0,0,0,.2),0 12px 32px rgba(0,0,0,.28);
+  --glow:radial-gradient(900px 420px at 10% -8%, rgba(59,155,255,.09), transparent 62%),
+         radial-gradient(760px 360px at 94% 2%, rgba(199,125,223,.06), transparent 60%),
+         radial-gradient(700px 340px at 50% 108%, rgba(52,199,89,.05), transparent 62%);
+}
+
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%}
 body{
-  background:var(--bg);color:var(--fg);
-  font:15px/1.62 -apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
-  -webkit-font-smoothing:antialiased;
-  background-image:
-    radial-gradient(1000px 460px at 8% -10%, rgba(0,113,227,.07), transparent 62%),
-    radial-gradient(820px 400px at 96% 2%, rgba(175,82,222,.05), transparent 60%),
-    radial-gradient(700px 380px at 50% 108%, rgba(52,199,89,.05), transparent 62%);
-  display:flex;overflow:hidden;
+  background:var(--bg);color:var(--fg);font-size:15px;line-height:1.6;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+  -webkit-font-smoothing:antialiased;background-image:var(--glow);
+  display:flex;overflow:hidden;transition:background-color .25s,color .25s;
 }
-::-webkit-scrollbar{width:9px;height:9px}
-::-webkit-scrollbar-thumb{background:rgba(0,0,0,.14);border-radius:9px;border:2px solid transparent;background-clip:padding-box}
+::selection{background:var(--blue-bg)}
+::-webkit-scrollbar{width:10px;height:10px}
+::-webkit-scrollbar-thumb{background:rgba(128,128,128,.32);border-radius:10px;border:3px solid transparent;background-clip:padding-box}
 ::-webkit-scrollbar-track{background:transparent}
+b,strong{font-weight:650}
+.mono{font-family:var(--mono);font-size:12.5px}
+.sub{color:var(--sub)}
+.n{text-align:right;font-variant-numeric:tabular-nums}
+.v{font-variant-numeric:tabular-nums}
+.bad{color:var(--red)}
+.warn{color:var(--orange)}
 
-/* ---------- 左侧导航 ---------- */
-.rail{width:218px;flex:0 0 218px;padding:18px 12px;display:flex;flex-direction:column;gap:2px;
-  border-right:1px solid var(--line);background:rgba(255,255,255,.42);
-  backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);overflow:auto}
-.brand{display:flex;align-items:center;gap:9px;padding:4px 8px 16px}
-.logo{width:26px;height:26px;border-radius:8px;background:linear-gradient(150deg,#3a9bff,#0060df);
-  display:grid;place-items:center;color:#fff;font-size:12px;font-weight:700;box-shadow:0 2px 8px rgba(0,113,227,.3)}
-.brand b{font-size:14.5px;font-weight:650}
-.brand span{display:block;font-size:11.5px;color:var(--sub);font-weight:400}
-.grp{font-size:11.5px;color:var(--sub2);padding:14px 9px 5px;letter-spacing:.4px}
-.nav{display:flex;align-items:center;gap:9px;padding:7px 9px;border-radius:9px;cursor:pointer;
-  color:#4b4b4f;font-size:13.5px;border:1px solid transparent;user-select:none}
-.nav:hover{background:rgba(0,0,0,.04)}
-.nav.on{background:#fff;border-color:var(--line);color:var(--fg);font-weight:600;
-  box-shadow:0 1px 2px rgba(0,0,0,.04)}
-.nav svg{width:15px;height:15px;flex:0 0 15px;opacity:.72}
+/* ============ 左侧导航 ============ */
+.rail{width:222px;flex:0 0 222px;padding:16px 12px;display:flex;flex-direction:column;gap:2px;
+  border-right:1px solid var(--line);background:var(--card2);
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);overflow-y:auto;transition:width .2s}
+.brand{display:flex;align-items:center;gap:10px;padding:4px 8px 14px}
+.logo{width:28px;height:28px;border-radius:9px;display:grid;place-items:center;color:#fff;
+  font-size:13px;font-weight:700;background:linear-gradient(150deg,#3b9bff,#0060df);
+  box-shadow:0 2px 10px rgba(0,113,227,.32)}
+.brand b{font-size:14.5px;font-weight:650;display:block;letter-spacing:-.1px}
+.brand span{font-size:11.5px;color:var(--sub)}
+.grp{font-size:11.5px;color:var(--sub2);padding:14px 9px 5px;letter-spacing:.3px}
+.nav{display:flex;align-items:center;gap:10px;padding:8px 9px;border-radius:9px;cursor:pointer;
+  color:var(--fg2);font-size:13.5px;border:1px solid transparent;user-select:none;white-space:nowrap}
+.nav:hover{background:rgba(128,128,128,.1)}
+.nav.on{background:var(--card);border-color:var(--line);color:var(--fg);font-weight:600;box-shadow:var(--shadow)}
+.nav svg{width:16px;height:16px;flex:0 0 16px;opacity:.7}
 .nav.on svg{opacity:1;color:var(--blue)}
 .rail .sp{flex:1}
-.acc{display:flex;align-items:center;gap:8px;padding:9px;border-radius:11px;background:rgba(255,255,255,.6);
-  border:1px solid var(--line)}
-.av{width:26px;height:26px;border-radius:50%;background:linear-gradient(150deg,#ffd08a,#ff9f5a);
-  display:grid;place-items:center;font-size:11px;font-weight:650;color:#7a4a10}
-.acc b{font-size:12.5px;font-weight:600;display:block}
-.acc span{font-size:11px;color:var(--sub)}
+.accmin{display:flex;align-items:center;gap:9px;padding:9px;border-radius:11px;
+  background:var(--card);border:1px solid var(--line)}
+.av{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;flex:0 0 28px;
+  font-size:12px;font-weight:650;color:#7a4a10;background:linear-gradient(150deg,#ffd08a,#ff9f5a)}
+.accmin b{font-size:12.5px;font-weight:600;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.accmin span{font-size:11px;color:var(--sub)}
 
-/* ---------- 主区 ---------- */
-.main{flex:1;overflow:auto;padding:28px 32px 60px}
-.top{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:20px;gap:16px}
+/* ============ 主区 ============ */
+.main{flex:1;overflow-y:auto;padding:26px 30px 88px;min-width:0}
+.top{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:20px;flex-wrap:wrap}
 .top h1{font-size:23px;font-weight:660;letter-spacing:-.3px}
 .top p{color:var(--sub);font-size:13.5px;margin-top:3px}
-.tools{display:flex;gap:8px;align-items:center}
-.pill{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;padding:4px 10px;border-radius:999px;
-  border:1px solid var(--line);background:rgba(255,255,255,.65);color:var(--sub)}
-.pill.ok{color:var(--green);border-color:rgba(52,199,89,.25);background:rgba(52,199,89,.08)}
+.tools{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.pill{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;padding:4px 11px;border-radius:999px;
+  border:1px solid var(--line);background:var(--card);color:var(--sub);white-space:nowrap}
 .pill b{color:var(--fg);font-weight:600}
-.dot{width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 0 3px rgba(52,199,89,.16)}
+.pill.ok{color:var(--green);border-color:rgba(52,199,89,.28);background:var(--green-bg)}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--green-s);box-shadow:0 0 0 3px rgba(52,199,89,.18)}
 
 .btn{font:inherit;font-size:13px;padding:6px 13px;border-radius:9px;cursor:pointer;border:1px solid var(--line);
-  background:rgba(255,255,255,.8);color:var(--fg);font-weight:500;white-space:nowrap}
-.btn:hover{border-color:rgba(0,0,0,.2)}
+  background:var(--card);color:var(--fg);font-weight:500;white-space:nowrap;transition:border-color .15s,background .15s}
+.btn:hover{border-color:rgba(128,128,128,.4)}
 .btn.p{background:var(--blue);border-color:var(--blue);color:#fff}
-.btn.p:hover{background:#0077ed}
+.btn.p:hover{filter:brightness(1.08)}
 .btn.s{padding:5px 10px;font-size:12.5px}
-.btn.dgr{color:var(--red);border-color:rgba(255,59,48,.28)}
+.btn.dgr{color:var(--red);border-color:rgba(255,59,48,.3)}
 .btn:disabled{opacity:.45;cursor:not-allowed}
 
-.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);font-size:13.5px;
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);
   backdrop-filter:blur(20px) saturate(1.35);-webkit-backdrop-filter:blur(20px) saturate(1.35);
-  box-shadow:0 1px 2px rgba(0,0,0,.03),0 10px 28px rgba(0,0,0,.045);padding:18px 20px}
-.ct{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;gap:10px}
+  box-shadow:var(--shadow);padding:18px 20px;font-size:13.5px;transition:background-color .25s,border-color .25s}
+.ct{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:14px;flex-wrap:wrap}
 .ct h3{font-size:14px;font-weight:640;letter-spacing:-.1px}
 .ct .hint{font-size:12.5px;color:var(--sub)}
 .g{display:grid;gap:14px}
-.g3{grid-template-columns:repeat(3,1fr)}
-.g2{grid-template-columns:repeat(2,1fr)}
-.g42{grid-template-columns:1.45fr 1fr}
-.g24{grid-template-columns:1fr 1.6fr}
+.g2{grid-template-columns:repeat(2,minmax(0,1fr))}
+.g3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.g4{grid-template-columns:repeat(4,minmax(0,1fr))}
+.ghero{grid-template-columns:1.6fr 1fr 1fr}
 .mt{margin-top:14px}
 
-.kv{display:flex;justify-content:space-between;font-size:13px;padding:5px 0}
-.kv span{color:var(--sub)}
-.kv b{font-weight:600;font-variant-numeric:tabular-nums}
+.kv{display:flex;justify-content:space-between;gap:12px;font-size:13px;padding:5px 0}
+.kv span{color:var(--sub);flex:0 0 auto}
+.kv b{font-weight:600;font-variant-numeric:tabular-nums;text-align:right}
 .kv+.kv{border-top:1px solid var(--line2)}
 
-.num{font-variant-numeric:tabular-nums}
-.big{font-size:34px;font-weight:680;letter-spacing:-.8px;line-height:1.06;font-variant-numeric:tabular-nums}
+.lbl{font-size:12.5px;color:var(--sub);margin-bottom:7px}
+.big{font-size:34px;font-weight:680;letter-spacing:-.9px;line-height:1.06;font-variant-numeric:tabular-nums}
 .big small{font-size:14px;font-weight:500;color:var(--sub);letter-spacing:0;margin-left:3px}
-.lbl{font-size:12.5px;color:var(--sub);margin-bottom:8px}
-.mono{font-family:var(--mono);font-size:12.5px}
+.hero .big{font-size:48px}
+.bar{height:6px;border-radius:99px;background:rgba(128,128,128,.16);overflow:hidden}
+.bar i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,var(--green-s),var(--blue))}
+.bar.o i{background:linear-gradient(90deg,var(--orange-s),var(--orange))}
 
 table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
 th{text-align:left;font-size:12px;font-weight:500;color:var(--sub);padding:0 9px 8px;
-  border-bottom:1px solid var(--line);white-space:nowrap}
+  border-bottom:1px solid var(--line);white-space:nowrap;user-select:none}
+th.sortable{cursor:pointer}
+th.sortable:hover{color:var(--fg)}
+th .ar{opacity:.45;font-size:10px;margin-left:3px}
 td{padding:9px 9px;border-bottom:1px solid var(--line2);font-size:13.5px;white-space:nowrap}
 tbody tr:last-child td{border-bottom:none}
-tbody tr:hover td{background:rgba(0,0,0,.018)}
-.n{text-align:right}
-.free{color:var(--green);font-weight:600}
-.warn{color:var(--orange)}
-.bad{color:var(--red)}
+tbody tr:hover td{background:rgba(128,128,128,.07)}
+.scroll{max-height:340px;overflow:auto;margin:0 -6px;padding:0 6px}
 
-.bar{height:6px;border-radius:99px;background:rgba(0,0,0,.06);overflow:hidden}
-.bar i{display:block;height:100%;background:linear-gradient(90deg,#34c759,#0071e3);border-radius:99px}
-
-.seg{display:inline-flex;background:rgba(0,0,0,.05);border-radius:9px;padding:2px;gap:2px}
-.seg button{font:inherit;font-size:12.5px;padding:4px 11px;border:0;border-radius:7px;background:transparent;
-  color:var(--sub);cursor:pointer}
-.seg button.on{background:#fff;color:var(--fg);font-weight:600;box-shadow:0 1px 3px rgba(0,0,0,.09)}
-
-.tags{display:flex;gap:5px;flex-wrap:wrap}
-.tg{font-size:11.5px;padding:2px 8px;border-radius:6px;background:rgba(0,0,0,.045);color:var(--sub)}
-.tg.b{background:rgba(0,113,227,.09);color:var(--blue)}
-.tg.g{background:rgba(52,199,89,.1);color:#248a3d}
-.tg.o{background:rgba(255,149,0,.11);color:#b25000}
+.tags{display:inline-flex;gap:5px;flex-wrap:wrap}
+.tg{font-size:11.5px;padding:2px 8px;border-radius:6px;background:rgba(128,128,128,.13);color:var(--sub);white-space:nowrap}
+.tg.b{background:var(--blue-bg);color:var(--blue)}
+.tg.g{background:var(--green-bg);color:var(--green)}
+.tg.o{background:var(--orange-bg);color:var(--orange)}
+.tg.r{background:var(--red-bg);color:var(--red)}
 
 .row{display:flex;align-items:center;gap:10px}
 .row.b{justify-content:space-between}
-.mt8{margin-top:8px}.mt12{margin-top:12px}.mt16{margin-top:16px}
-.fs11{font-size:12.5px}.fs12{font-size:13px}
-.sub{color:var(--sub)}
-.empty{padding:22px;text-align:center;color:var(--sub2);font-size:13px}
+.row.w{flex-wrap:wrap}
+.mt8{margin-top:8px}.mt12{margin-top:12px}.mt16{margin-top:16px}.mt20{margin-top:20px}
+.fs12{font-size:12.5px}.fs13{font-size:13px}
+.empty{padding:26px 18px;text-align:center;color:var(--sub2);font-size:13px;line-height:1.7}
+.empty .ic{font-size:22px;opacity:.5;display:block;margin-bottom:6px}
 
-/* 账号卡 */
-.acct{display:flex;gap:12px;align-items:flex-start}
-.acct .av{width:36px;height:36px;border-radius:11px;font-size:14px;flex:0 0 36px}
-.acct h4{font-size:14px;font-weight:640}
-.acct .m{font-size:12.5px;color:var(--sub);margin-top:1px}
-.acct.off{opacity:.55}
+.seg{display:inline-flex;background:rgba(128,128,128,.13);border-radius:9px;padding:2px;gap:2px}
+.seg button{font:inherit;font-size:12.5px;padding:4px 11px;border:0;border-radius:7px;background:transparent;
+  color:var(--sub);cursor:pointer;white-space:nowrap}
+.seg button.on{background:var(--card);color:var(--fg);font-weight:600;box-shadow:0 1px 3px rgba(0,0,0,.12)}
+
+.inp{font:inherit;font-size:13px;padding:6px 10px;border-radius:8px;border:1px solid var(--line);
+  background:var(--card);color:var(--fg);width:100%;max-width:230px}
+.inp:focus{outline:none;border-color:var(--blue)}
+.sw{width:40px;height:23px;border-radius:99px;background:rgba(128,128,128,.3);position:relative;cursor:pointer;flex:0 0 40px;transition:background .18s}
+.sw::after{content:"";position:absolute;width:19px;height:19px;border-radius:50%;background:#fff;top:2px;left:2px;
+  box-shadow:0 1px 3px rgba(0,0,0,.25);transition:left .18s}
+.sw.on{background:var(--green-s)}
+.sw.on::after{left:19px}
+
+/* 账号健康快照 */
+.hcards{display:grid;gap:12px;grid-template-columns:repeat(auto-fill,minmax(238px,1fr))}
+.hc{border:1px solid var(--line);border-radius:var(--r2);background:var(--card2);padding:13px 14px}
+.hc .hd{display:flex;align-items:center;gap:9px;margin-bottom:9px}
+.hc .hd b{font-size:13.5px;font-weight:640;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hc .m{font-size:12px;color:var(--sub);margin-top:2px}
+.hc .bar{margin-top:11px}
 
 /* 图表 */
-.chart{display:flex;align-items:flex-end;gap:3px;height:120px;padding-top:6px}
-.chart i{flex:1;background:linear-gradient(180deg,rgba(0,113,227,.85),rgba(0,113,227,.35));
-  border-radius:3px 3px 0 0;min-height:2px}
-.chart i.g{background:linear-gradient(180deg,rgba(52,199,89,.8),rgba(52,199,89,.28))}
-.xax{display:flex;gap:3px;margin-top:6px}
+.chartbox{position:relative;height:132px;display:flex;align-items:flex-end;gap:3px;padding-top:6px}
+.chartbox i{flex:1;min-width:3px;min-height:2px;border-radius:3px 3px 0 0;
+  background:linear-gradient(180deg,var(--blue),rgba(0,113,227,.32));transition:height .3s;cursor:pointer}
+.chartbox i.z{background:rgba(128,128,128,.14)}
+.chartbox i:hover{filter:brightness(1.2)}
+.xax{display:flex;gap:3px;margin-top:7px}
 .xax span{flex:1;text-align:center;font-size:10.5px;color:var(--sub2)}
+.tip{position:fixed;z-index:200;pointer-events:none;opacity:0;transition:opacity .12s;
+  background:var(--card);border:1px solid var(--line);border-radius:9px;padding:8px 11px;font-size:12.5px;
+  box-shadow:var(--shadow);backdrop-filter:blur(14px);white-space:nowrap}
+.tip.on{opacity:1}
 
 /* 日志 */
-.log{font-family:var(--mono);font-size:12.5px;line-height:1.85;max-height:340px;overflow:auto}
-.log div{display:flex;gap:9px;padding:1px 0}
-.log t{color:var(--sub2);flex:0 0 58px}
-.log b{flex:0 0 44px;font-weight:600}
-.log .i b{color:var(--blue)} .log .w b{color:var(--orange)} .log .e b{color:var(--red)}
-.log p{color:#3a3a3c;white-space:pre-wrap;word-break:break-all}
+.log{font-family:var(--mono);font-size:12.5px;line-height:1.85;max-height:380px;overflow:auto}
+.log .li{display:flex;gap:10px;padding:1px 0}
+.log .li t{color:var(--sub2);flex:0 0 62px}
+.log .li b{flex:0 0 46px;font-weight:600}
+.log .i b{color:var(--blue)}.log .w b{color:var(--orange)}.log .e b{color:var(--red)}.log .s b{color:var(--sub)}
+.log .li p{color:var(--fg2);white-space:pre-wrap;word-break:break-all;flex:1}
 
-/* 任务 */
+/* 任务 / 客户端 / 设置 */
 .task{display:flex;align-items:center;gap:11px;padding:11px 12px;border:1px solid var(--line);
-  border-radius:var(--r2);background:rgba(255,255,255,.5)}
-.task .ic{width:30px;height:30px;border-radius:9px;display:grid;place-items:center;flex:0 0 30px;
-  background:rgba(0,113,227,.09);color:var(--blue)}
-.task .ic.g{background:rgba(52,199,89,.1);color:#248a3d}
-.task .ic.o{background:rgba(255,149,0,.1);color:#b25000}
-.task h4{font-size:13.5px;font-weight:600}
+  border-radius:var(--r2);background:var(--card2)}
+.task .ic{width:30px;height:30px;border-radius:9px;display:grid;place-items:center;flex:0 0 30px;font-size:12px;
+  background:var(--blue-bg);color:var(--blue);font-weight:600}
+.task .ic.g{background:var(--green-bg);color:var(--green)}
+.task h4{font-size:13.5px;font-weight:640}
 .task p{font-size:12px;color:var(--sub)}
 .task .sp{flex:1}
-.chk{width:17px;height:17px;border-radius:50%;border:1.5px solid rgba(52,199,89,.5);
-  display:grid;place-items:center;color:#fff;font-size:10px;background:var(--green);flex:0 0 17px}
-.chk.no{background:transparent;border-color:rgba(0,0,0,.16)}
+.chk{width:18px;height:18px;border-radius:50%;display:grid;place-items:center;flex:0 0 18px;
+  color:#fff;font-size:10px;background:var(--green-s)}
+.chk.no{background:transparent;border:1.5px solid rgba(128,128,128,.35)}
 
-/* 智能体 */
 .cli{display:flex;align-items:center;gap:12px;padding:13px;border:1px solid var(--line);
-  border-radius:var(--r2);background:rgba(255,255,255,.55)}
+  border-radius:var(--r2);background:var(--card2);flex-wrap:wrap}
 .cli .ic{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;flex:0 0 34px;
-  font-size:12px;font-weight:700;color:#fff;background:#333}
+  font-size:12px;font-weight:700;color:#fff;background:#555}
 .cli h4{font-size:14px;font-weight:640}
 .cli p{font-size:12.5px;color:var(--sub)}
 .cli .sp{flex:1}
 
-/* 设置 */
-.set{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:11px 0}
+.set{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:11px 0;flex-wrap:wrap}
 .set+.set{border-top:1px solid var(--line2)}
-.set h4{font-size:13.5px;font-weight:600}
+.set h4{font-size:13.5px;font-weight:640}
 .set p{font-size:12px;color:var(--sub);margin-top:1px}
-.sw{width:38px;height:22px;border-radius:99px;background:rgba(0,0,0,.14);position:relative;
-  cursor:pointer;flex:0 0 38px;transition:background .18s}
-.sw::after{content:"";position:absolute;width:18px;height:18px;border-radius:50%;background:#fff;
-  top:2px;left:2px;box-shadow:0 1px 3px rgba(0,0,0,.2);transition:left .18s}
-.sw.on{background:var(--green)}
-.sw.on::after{left:18px}
-.inp{font:inherit;font-size:13px;padding:6px 10px;border-radius:8px;border:1px solid var(--line);
-  background:rgba(255,255,255,.8);width:210px;color:var(--fg)}
 
-.note{padding:11px 13px;border-radius:var(--r2);font-size:11.5px;color:var(--sub);
-  background:rgba(0,113,227,.05);border:1px solid rgba(0,113,227,.11);line-height:1.65;font-size:12.5px}
+.note{padding:11px 13px;border-radius:var(--r2);font-size:12.5px;color:var(--sub);
+  background:var(--blue-bg);border:1px solid rgba(0,113,227,.14);line-height:1.7}
 .note b{color:var(--fg)}
-.warnbox{background:rgba(255,149,0,.06);border-color:rgba(255,149,0,.18)}
+.warnbox{background:var(--orange-bg);border-color:rgba(255,149,0,.22)}
 
-.page{display:none}.page.on{display:block}
+/* 弹窗 / 浮层 */
+.mask{position:fixed;inset:0;background:rgba(0,0,0,.34);z-index:300;display:none;
+  align-items:center;justify-content:center;padding:24px;backdrop-filter:blur(3px)}
+.mask.on{display:flex}
+.dlg{background:var(--bg);border:1px solid var(--line);border-radius:18px;padding:22px;width:min(430px,100%);
+  box-shadow:0 24px 70px rgba(0,0,0,.3)}
+.dlg h3{font-size:16px;font-weight:660;margin-bottom:8px}
+.dlg p{font-size:13.5px;color:var(--sub);line-height:1.7;margin-bottom:18px}
+.dlg .row{justify-content:flex-end}
+.toast{position:fixed;left:50%;bottom:96px;transform:translateX(-50%) translateY(12px);z-index:400;
+  background:var(--fg);color:var(--bg);font-size:13px;padding:9px 16px;border-radius:999px;
+  opacity:0;transition:opacity .2s,transform .2s;pointer-events:none;box-shadow:0 8px 26px rgba(0,0,0,.25)}
+.toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* 底部浮动工具条 */
+.dock{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);z-index:150;
+  display:flex;gap:4px;padding:6px;border-radius:14px;background:var(--card);border:1px solid var(--line);
+  box-shadow:var(--shadow);backdrop-filter:blur(20px)}
+.dock button{width:34px;height:34px;border:0;border-radius:9px;background:transparent;color:var(--sub);
+  cursor:pointer;display:grid;place-items:center}
+.dock button:hover{background:rgba(128,128,128,.14);color:var(--fg)}
+.dock button.on{color:var(--blue)}
+.dock svg{width:17px;height:17px}
+
+.page{display:none}
+.page.on{display:block}
+
+/* ============ 响应式 ============ */
+@media (max-width:1240px){
+  .ghero{grid-template-columns:1fr 1fr}
+  .g4{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media (max-width:1080px){
+  .rail{width:64px;flex:0 0 64px;align-items:center}
+  .rail .brand div,.rail .grp,.rail .nav span,.rail .accmin div{display:none}
+  .nav{justify-content:center;padding:10px}
+  .main{padding:22px 20px 88px}
+  .g2,.g3,.g4,.ghero{grid-template-columns:1fr}
+}
+@media (max-width:640px){
+  .top h1{font-size:20px}
+  .hero .big{font-size:38px}
+  .main{padding:16px 14px 88px}
+}
 </style>
 </head>
 <body>
 
-<!-- ================= 左侧导航 ================= -->
+<!-- ============ 左侧导航 ============ -->
 <aside class="rail">
   <div class="brand">
     <div class="logo">W</div>
-    <div><b>WorkBuddy 网关</b><span>本机 · 127.0.0.1:8788</span></div>
+    <div><b>WorkBuddy 网关</b><span id="rail-host">127.0.0.1:8788</span></div>
   </div>
-
   <div class="grp">基本功能</div>
-  <div class="nav on" data-p="gw"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 12h4l3-8 4 16 3-8h4"/></svg>网关与账号</div>
-  <div class="nav" data-p="task"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 6L9 17l-5-5"/></svg>任务与福利</div>
-  <div class="nav" data-p="dash"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>数据看板</div>
-  <div class="nav" data-p="agent"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="14" rx="2"/><path d="M8 21h8M9 9l3 3-3 3"/></svg>智能体配置</div>
-  <div class="nav" data-p="log"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 4h16v16H4z"/><path d="M8 9h8M8 13h8M8 17h5"/></svg>运行日志</div>
-  <div class="nav" data-p="set"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M19 5l-2 2M7 17l-2 2"/></svg>设置</div>
-
+  <div class="nav on" data-p="gw"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 12h4l3-8 4 16 3-8h4"/></svg><span>网关与账号</span></div>
+  <div class="nav" data-p="task"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 6L9 17l-5-5"/></svg><span>任务与福利</span></div>
+  <div class="nav" data-p="dash"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg><span>数据看板</span></div>
+  <div class="nav" data-p="agent"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="14" rx="2"/><path d="M8 21h8M9 9l3 3-3 3"/></svg><span>智能体配置</span></div>
+  <div class="nav" data-p="log"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 4h16v16H4z"/><path d="M8 9h8M8 13h8M8 17h5"/></svg><span>运行日志</span></div>
+  <div class="nav" data-p="set"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M19 5l-2 2M7 17l-2 2"/></svg><span>设置</span></div>
   <div class="grp">其他</div>
-  <div class="nav" data-p="mcp"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M6 10v4M10 10v4M14 10v4M18 10v4"/></svg>MCP</div>
-  <div class="nav" data-p="skill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2l2.5 6.5L21 11l-6.5 2.5L12 20l-2.5-6.5L3 11l6.5-2.5z"/></svg>Skills</div>
-  <div class="nav" data-p="prompt"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 4h16v12H8l-4 4z"/></svg>提示词</div>
-  <div class="nav" data-p="conv"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 12a8 8 0 11-3-6.2"/><path d="M21 3v5h-5"/></svg>会话</div>
-  <div class="nav" data-p="auth"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2l8 4v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6z"/></svg>授权中心</div>
-  <div class="nav" data-p="usage"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 3v18h18"/><path d="M7 15l4-6 4 4 4-7"/></svg>用量统计</div>
-
+  <div class="nav" data-p="mcp"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M6 10v4M10 10v4M14 10v4M18 10v4"/></svg><span>MCP</span></div>
+  <div class="nav" data-p="skill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2l2.5 6.5L21 11l-6.5 2.5L12 20l-2.5-6.5L3 11l6.5-2.5z"/></svg><span>Skills</span></div>
+  <div class="nav" data-p="prompt"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 4h16v12H8l-4 4z"/></svg><span>提示词</span></div>
+  <div class="nav" data-p="conv"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 12a8 8 0 11-3-6.2"/><path d="M21 3v5h-5"/></svg><span>会话</span></div>
+  <div class="nav" data-p="auth"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2l8 4v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6z"/></svg><span>授权中心</span></div>
+  <div class="nav" data-p="usage"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 3v18h18"/><path d="M7 15l4-6 4 4 4-7"/></svg><span>用量统计</span></div>
   <div class="sp"></div>
-  <div class="acc">
+  <div class="accmin">
     <div class="av">羊</div>
-    <div><b>六只羊🐑</b><span>国内版 · 余额 2525.81</span></div>
+    <div><b>六只羊🐑</b><span id="rail-credits">余额 —</span></div>
   </div>
 </aside>
 
-<!-- ================= 主区 ================= -->
-<main class="main">
+<main class="main" id="main">
 
   <!-- ============ 网关与账号 ============ -->
   <section class="page on" id="p-gw">
     <div class="top">
-      <div><h1>网关与账号</h1><p>管理账号凭证与代理出口，查看当日用量、请求流水、成签到与活跃记录</p></div>
+      <div><h1>网关与账号</h1><p>账号健康、网关状态、当日用量与请求流水</p></div>
       <div class="tools">
         <span class="pill ok"><span class="dot"></span>网关运行中</span>
         <span class="pill">监听 <b>127.0.0.1:8788</b></span>
-        <button class="btn">+ 添加账号</button>
+        <button class="btn" data-confirm="将重新读取桌面客户端凭证并加入账号池，需要客户端正在运行。">从桌面端导入</button>
+        <button class="btn p">+ 添加账号</button>
       </div>
     </div>
 
-    <div class="g g2">
-      <div class="card">
-        <div class="ct"><h3>账号列表</h3><span class="hint">国内版 1 个 · 国际版 0 个</span></div>
-        <div class="acct">
-          <div class="av">羊</div>
-          <div style="flex:1">
-            <div class="row b">
-              <h4>六只羊🐑 <span class="tg g">国内版</span> <span class="tg b">CLI</span></h4>
-              <div class="row">
-                <button class="btn s">停用</button><button class="btn s">编辑</button><button class="btn s">导出</button>
-              </div>
-            </div>
-            <div class="m">copilot.tencent.com · 30 天后到期 · 已接入桌面端凭证</div>
-            <div class="g g3 mt12">
-              <div><div class="lbl">剩余积分</div><div class="big">2525<small>.81</small></div></div>
-              <div><div class="lbl">今日消耗</div><div class="big">14<small>.95</small></div></div>
-              <div><div class="lbl">今日请求</div><div class="big">58<small>次</small></div></div>
-            </div>
-            <div class="bar mt12"><i style="width:24%"></i></div>
-            <div class="kv mt8"><span>总额 / 已用</span><b>3326 / 800.19（24.1%）</b></div>
-            <div class="kv"><span>签到</span><b>今日已签 · 连续 17 天 · 日 +100</b></div>
-          </div>
+    <div class="g ghero">
+      <div class="card hero">
+        <div class="lbl">积分余额</div>
+        <div class="big" id="v-remain">—</div>
+        <div class="bar mt12"><i id="v-bar" style="width:0%"></i></div>
+        <div class="row b mt12 fs12 sub">
+          <span>总额 <b class="v" id="v-size">—</b></span>
+          <span>已用 <b class="v" id="v-used">—</b>（<b class="v" id="v-pct">—</b>）</span>
         </div>
-        <div class="acct off mt16">
-          <div class="av" style="background:rgba(0,0,0,.07);color:var(--sub)">G</div>
-          <div style="flex:1">
-            <h4>国际版（www.workbuddy.ai）</h4>
-            <div class="m">当前未接入账号。仅国内版在使用，此卡片可折叠隐藏。</div>
-          </div>
-        </div>
+        <div class="mt12 fs12 sub" id="v-expire">—</div>
       </div>
-
       <div class="card">
-        <div class="ct"><h3>网关状态</h3><span class="hint">catalog: remote</span></div>
-        <div class="kv"><span>监听地址</span><b>http://127.0.0.1:8788/v1</b></div>
-        <div class="kv"><span>API Key 鉴权</span><b class="free">关闭（仅本机）</b></div>
-        <div class="kv"><span>上游区域</span><div class="row"><b>国内版 cn</b><button class="btn s">切换</button></div></div>
-        <div class="kv"><span>上游地址</span><b>www.workbuddy.cn</b></div>
+        <div class="lbl">今日消耗</div>
+        <div class="big" id="v-today">—</div>
+        <div class="kv mt8"><span>请求</span><b id="v-treq">—</b></div>
+        <div class="kv"><span>tokens</span><b id="v-ttok">—</b></div>
+      </div>
+      <div class="card">
+        <div class="lbl">签到</div>
+        <div class="big" id="v-streak">—</div>
+        <div class="kv mt8"><span>今日</span><b id="v-checkin">—</b></div>
+        <div class="kv"><span>每次奖励</span><b id="v-daily">—</b></div>
+      </div>
+    </div>
+
+    <div class="card mt">
+      <div class="ct"><h3>账号健康快照</h3><span class="hint" id="acc-hint">—</span></div>
+      <div class="hcards" id="acc-cards"></div>
+    </div>
+
+    <div class="g g2 mt">
+      <div class="card">
+        <div class="ct"><h3>网关状态</h3><span class="hint" id="cat-src">—</span></div>
+        <div class="kv"><span>监听地址</span><b class="mono">http://127.0.0.1:8788/v1</b></div>
+        <div class="kv"><span>API Key 鉴权</span><b class="tg g">关闭 · 仅本机</b></div>
+        <div class="kv"><span>上游区域</span><span class="row"><b id="v-realm">国内版 cn</b><button class="btn s" data-confirm="切换到国际版会改变所有未绑定区域的 Key 走向，且需要国际版账号。">切换</button></span></div>
+        <div class="kv"><span>上游地址</span><b class="mono">www.workbuddy.cn</b></div>
         <div class="kv"><span>User-Agent</span><b class="mono">WorkBuddy/5.8.4 CLI/2.161.0</b></div>
-        <div class="kv"><span>模型目录</span><b>16 个 · 来自上游 API</b></div>
-        <div class="kv"><span>本地网络工具</span><b class="free">已开启</b></div>
+        <div class="kv"><span>模型目录</span><b id="v-mcount">—</b></div>
+        <div class="kv"><span>本地网络工具</span><b class="tg g">已开启</b></div>
         <div class="ct mt16"><h3>当前禁用 / 冷却</h3></div>
-        <div class="empty">无。账号与模型均在正常服务状态。</div>
+        <div class="empty" id="disabled-box"><span class="ic">○</span>无。账号与模型均在正常服务状态。</div>
       </div>
-    </div>
 
-    <div class="g g42 mt">
       <div class="card">
         <div class="ct"><h3>最近请求</h3>
-          <div class="row"><span class="hint">共 67 条</span><button class="btn s">导出</button></div></div>
-        <table>
-          <thead><tr><th>时间</th><th>模型</th><th class="n">输入</th><th class="n">输出</th>
-            <th class="n">tokens</th><th class="n">积分</th><th class="n">缓存</th></tr></thead>
-          <tbody>
-            <tr><td class="mono">17:31:58</td><td>deepseek-v4.1-flash</td><td class="n">242,262</td><td class="n">1,263</td><td class="n">243,525</td><td class="n">0.14</td><td class="n">99.9%</td></tr>
-            <tr><td class="mono">17:31:49</td><td>deepseek-v4.1-flash</td><td class="n">241,788</td><td class="n">459</td><td class="n">242,247</td><td class="n">0.10</td><td class="n">99.7%</td></tr>
-            <tr><td class="mono">17:22:36</td><td>deepseek-v4.1-flash</td><td class="n">146,649</td><td class="n">1,026</td><td class="n">147,675</td><td class="n">0.10</td><td class="n">99.9%</td></tr>
-            <tr><td class="mono">17:22:28</td><td>deepseek-v4.1-flash</td><td class="n">145,392</td><td class="n">1,189</td><td class="n">146,581</td><td class="n">0.15</td><td class="n">98.2%</td></tr>
-            <tr><td class="mono">17:22:20</td><td>deepseek-v4.1-flash</td><td class="n">141,900</td><td class="n">831</td><td class="n">142,731</td><td class="n">0.09</td><td class="n">99.9%</td></tr>
-            <tr><td class="mono">16:50:44</td><td>deepseek-v4.1-flash</td><td class="n">238,595</td><td class="n">8,755</td><td class="n">247,350</td><td class="n bad">3.91</td><td class="n">0%</td></tr>
-            <tr><td class="mono">16:50:12</td><td>deepseek-v4.1-flash</td><td class="n">122,586</td><td class="n">635</td><td class="n">123,221</td><td class="n bad">1.79</td><td class="n">0%</td></tr>
-          </tbody>
-        </table>
-        <div class="note mt12">积分由上游返回，四舍五入到 <b>0.01</b>；单条小请求会显示 0。<b>缓存命中率</b>决定实际单价——同尺寸请求命中 99% 时只要 0.10，未命中要 1.79。</div>
-      </div>
-
-      <div class="card">
-        <div class="ct"><h3>最近模型清单</h3><button class="btn s">刷新模型</button></div>
-        <div class="scroll" style="max-height:236px;overflow:auto;margin:0 -6px;padding:0 6px">
-          <table>
-            <thead><tr><th>模型</th><th class="n">倍率</th><th class="n">上下文</th></tr></thead>
-            <tbody>
-              <tr><td>hy4-preview</td><td class="n">x0.29</td><td class="n">960,000</td></tr>
-              <tr><td>hy3</td><td class="n free">x0.00</td><td class="n">192,000</td></tr>
-              <tr><td>deepseek-v4.1-flash</td><td class="n">x0.11</td><td class="n">1,000,000</td></tr>
-              <tr><td>glm-5.3</td><td class="n">x0.79</td><td class="n">1,000,000</td></tr>
-              <tr><td>glm-5.3-flash</td><td class="n">x0.06</td><td class="n">1,000,000</td></tr>
-              <tr><td>glm-5.2</td><td class="n">x0.79</td><td class="n">1,000,000</td></tr>
-              <tr><td>glm-5.1</td><td class="n">x0.79</td><td class="n">200,000</td></tr>
-              <tr><td>glm-5v-turbo</td><td class="n">x0.71</td><td class="n">200,000</td></tr>
-              <tr><td>minimax-m3</td><td class="n">x0.25</td><td class="n">512,000</td></tr>
-              <tr><td>kimi-k3-1</td><td class="n">x1.62</td><td class="n">1,000,000</td></tr>
-              <tr><td>kimi-k2.8-preview</td><td class="n">x0.77</td><td class="n">1,000,000</td></tr>
-              <tr><td>kimi-k2.7</td><td class="n">x0.57</td><td class="n">256,000</td></tr>
-              <tr><td>kimi-k2.6</td><td class="n">x0.52</td><td class="n">256,000</td></tr>
-              <tr><td>deepseek-v4-pro</td><td class="n">x0.51</td><td class="n">1,000,000</td></tr>
-              <tr><td>step-5-preview</td><td class="n free">x0.00</td><td class="n">1,000,000</td></tr>
-              <tr><td>space-bunny</td><td class="n">x0.08</td><td class="n">1,000,000</td></tr>
-            </tbody>
+          <div class="row"><span class="hint" id="recent-hint">—</span><button class="btn s" data-confirm="将把当前筛选出的请求流水导出为 CSV。">导出</button></div></div>
+        <div class="scroll" style="max-height:300px">
+          <table id="t-recent">
+            <thead><tr>
+              <th class="sortable" data-k="time">时间<span class="ar"></span></th>
+              <th>模型</th><th class="n sortable" data-k="prompt">输入<span class="ar"></span></th>
+              <th class="n sortable" data-k="completion">输出<span class="ar"></span></th>
+              <th class="n sortable" data-k="total">tokens<span class="ar"></span></th>
+              <th class="n sortable" data-k="credit">积分<span class="ar"></span></th>
+              <th class="n sortable" data-k="cache">缓存<span class="ar"></span></th>
+            </tr></thead>
+            <tbody></tbody>
           </table>
         </div>
-        <div class="ct mt16"><h3>签到与活跃记录</h3><span class="hint">最近 5 次真实尝试</span></div>
-        <table>
-          <thead><tr><th>时间</th><th>任务</th><th>结果</th></tr></thead>
-          <tbody>
-            <tr><td class="mono">今日 00:12</td><td>每日签到</td><td class="free">成功 +100</td></tr>
-            <tr><td class="mono">今日 08:40</td><td>每日活跃</td><td class="free">成功 +30</td></tr>
-            <tr><td class="mono">昨日 00:09</td><td>每日签到</td><td class="free">成功 +100</td></tr>
-            <tr><td class="mono">昨日 09:15</td><td>每日活跃</td><td class="free">成功 +30</td></tr>
-            <tr><td class="mono">前日 00:07</td><td>每日签到</td><td class="free">成功 +100</td></tr>
-          </tbody>
+        <div class="note mt12">积分由上游返回，四舍五入到 <b>0.01</b>，单条小请求会显示 0。<b>缓存命中率决定实际单价</b>：同尺寸请求命中 99% 约 0.10，未命中要 1.79。</div>
+      </div>
+    </div>
+
+    <div class="card mt">
+      <div class="ct"><h3>最近模型清单</h3>
+        <div class="row">
+          <input class="inp" id="model-q" placeholder="搜索模型…" style="max-width:170px" />
+          <button class="btn s" data-confirm="立即向上游拉取一次模型目录（含最新倍率），约 1~3 秒。">刷新模型</button>
+        </div></div>
+      <div class="scroll" style="max-height:300px">
+        <table id="t-models">
+          <thead><tr>
+            <th class="sortable" data-k="id">模型<span class="ar"></span></th>
+            <th class="n sortable" data-k="rate">倍率<span class="ar"></span></th>
+            <th class="n sortable" data-k="ctx">上下文<span class="ar"></span></th>
+            <th>推理档位</th>
+          </tr></thead>
+          <tbody></tbody>
         </table>
       </div>
     </div>
@@ -354,30 +403,26 @@ tbody tr:hover td{background:rgba(0,0,0,.018)}
   <!-- ============ 任务与福利 ============ -->
   <section class="page" id="p-task">
     <div class="top">
-      <div><h1>任务与福利</h1><p>国内版成长任务、连续打卡与猫猫日常，一键点亮领奖</p></div>
+      <div><h1>任务与福利</h1><p>后台调度器自动执行，也可手动触发</p></div>
       <div class="tools">
-        <span class="pill ok">今日已签到 · 连续 <b>17</b> 天</span>
-        <button class="btn p">一键全部领取</button>
+        <span class="pill ok"><span class="dot"></span>调度器已启用</span>
+        <span class="hint">下次执行 <b id="sched-next">—</b></span>
+        <button class="btn" data-confirm="暂停后所有定时任务停止，直到重新启用。确定暂停？">暂停调度</button>
+        <button class="btn p" data-confirm="立即执行一轮全部定时任务（签到 / 活跃 / 猫猫 / 保活）。">立即执行一次</button>
       </div>
     </div>
 
     <div class="g g3">
-      <div class="card"><div class="lbl">今日新增积分</div><div class="big">+130</div>
+      <div class="card"><div class="lbl">今日新增积分</div><div class="big" id="v-gain">—</div>
         <div class="kv mt8"><span>签到</span><b>+100</b></div><div class="kv"><span>每日活跃</span><b>+30</b></div></div>
-      <div class="card"><div class="lbl">连续签到</div><div class="big">17<small>天</small></div>
-        <div class="kv mt8"><span>下次奖励</span><b>第 7 天翻倍 +200</b></div><div class="kv"><span>中断重置</span><b>断签从第 1 天重新计</b></div></div>
-      <div class="card"><div class="lbl">最近到期积分包</div><div class="big">17<small>天后</small></div>
-        <div class="kv mt8"><span>CodeBuddy个人版裂变包</span><b>97.89</b></div><div class="kv"><span>到期日</span><b>2026-11-04</b></div></div>
+      <div class="card"><div class="lbl">连续签到</div><div class="big" id="v-streak2">—</div>
+        <div class="kv mt8"><span>下次奖励</span><b>第 7 天翻倍 +200</b></div><div class="kv"><span>中断后果</span><b>从第 1 天重新计</b></div></div>
+      <div class="card"><div class="lbl">最近到期积分包</div><div class="big" id="v-expdays">—</div>
+        <div class="kv mt8"><span>裂变包剩余</span><b>97.89</b></div><div class="kv"><span>到期日</span><b>2026-11-04</b></div></div>
     </div>
 
-<div class="card mt">
-      <div class="ct"><h3>后台调度器</h3>
-        <div class="row">
-          <span class="pill ok"><span class="dot"></span>已启用 · 随网关运行</span>
-          <span class="hint">下次执行 <b>今日 21:00</b></span>
-          <button class="btn s">暂停调度</button>
-          <button class="btn s p">立即执行一次</button>
-        </div></div>
+    <div class="card mt">
+      <div class="ct"><h3>后台调度器</h3><span class="hint">网关进程内的后台线程 · 关窗口即暂停</span></div>
       <div class="g g2">
         <div>
           <table>
@@ -392,36 +437,24 @@ tbody tr:hover td{background:rgba(0,0,0,.018)}
           </table>
         </div>
         <div>
-          <div class="kv"><span>上次执行</span><b>今日 09:00 · 签到成功 +100</b></div>
-          <div class="kv"><span>Token 剩余寿命</span><b class="free">29 天，暂不需刷新</b></div>
-          <div class="kv"><span>执行记录</span><b>保留最近 60 条，同步进运行日志</b></div>
+          <div class="kv"><span>上次执行</span><b id="sched-last">—</b></div>
+          <div class="kv"><span>Token 剩余寿命</span><b class="tg g">29 天，暂不需刷新</b></div>
+          <div class="kv"><span>执行记录</span><b>保留最近 60 条</b></div>
           <div class="kv"><span>时间基准</span><b>CST 24 小时制</b></div>
-          <div class="note mt12">调度器是<b>网关进程内的后台线程</b>：网关开着才跑，关掉窗口等于暂停。所有动作都会写进运行日志，标签为「调度器 / 任务」。</div>
+          <div class="note mt12">所有动作都写进运行日志，标签为「调度器 / 任务」。<b>快过期的积分会被优先消耗</b>，不会浪费。</div>
         </div>
       </div>
     </div>
 
     <div class="g g2 mt">
       <div class="card">
-        <div class="ct"><h3>成长任务</h3><button class="btn s">刷新状态</button></div>
-        <div class="row mt8"><div class="task" style="flex:1"><div class="ic">签</div>
-          <div><h4>每日签到</h4><p>每天一次，连签有额外奖励</p></div>
-          <div class="sp"></div><div class="chk">✓</div></div></div>
-        <div class="row mt8"><div class="task" style="flex:1"><div class="ic g">聊</div>
-          <div><h4>每日活跃对话</h4><p>与任意模型完成一轮对话</p></div>
-          <div class="sp"></div><div class="chk">✓</div></div></div>
-        <div class="row mt8"><div class="task" style="flex:1"><div class="ic o">探</div>
-          <div><h4>探索新模型</h4><p>使用一个本周没用过的模型</p></div>
-          <div class="sp"></div><div class="chk no"></div></div></div>
-        <div class="row mt8"><div class="task" style="flex:1"><div class="ic">享</div>
-          <div><h4>分享邀请</h4><p>邀请好友注册并激活</p></div>
-          <div class="sp"></div><div class="chk no"></div></div></div>
+        <div class="ct"><h3>成长任务</h3><button class="btn s" data-confirm="重新拉取一次任务状态。">刷新状态</button></div>
+        <div id="task-list"></div>
       </div>
-
       <div class="card">
-        <div class="ct"><h3>猫猫日常</h3><div class="row"><button class="btn s">派出旅行</button><button class="btn s">领奖</button></div></div>
+        <div class="ct"><h3>猫猫日常</h3><div class="row"><button class="btn s" data-confirm="派出猫猫去旅行？">派出旅行</button><button class="btn s" data-confirm="领取本次旅行带回的奖励？">领奖</button></div></div>
         <div class="kv"><span>当前状态</span><b>旅行中 · 剩余 2 小时 14 分</b></div>
-        <div class="kv"><span>已带回纪念品</span><b>3 件（积分 +50）</b></div>
+        <div class="kv"><span>已带回纪念品</span><b>3 件（+50 积分）</b></div>
         <div class="kv"><span>今日次数</span><b>1 / 3</b></div>
         <div class="ct mt16"><h3>领取记录</h3></div>
         <table>
@@ -435,132 +468,73 @@ tbody tr:hover td{background:rgba(0,0,0,.018)}
         </table>
       </div>
     </div>
+
     <div class="card mt">
       <div class="ct"><h3>积分获取历史</h3><span class="hint">只读内存快照，不发上游请求</span></div>
       <table>
         <thead><tr><th>积分包</th><th>发放时间</th><th class="n">面额</th><th class="n">剩余</th><th>到期</th><th>状态</th></tr></thead>
-        <tbody>
-          <tr><td>CodeBuddy个人版裂变包</td><td class="mono">2026-10-11</td><td class="n">300</td><td class="n">97.89</td><td class="mono">2026-11-04</td><td class="free">使用中</td></tr>
-          <tr><td>每日签到奖励</td><td class="mono">今日 00:12</td><td class="n">100</td><td class="n">100</td><td class="mono">长期</td><td class="free">可用</td></tr>
-          <tr><td>连签第 7 天奖励</td><td class="mono">2026-10-15</td><td class="n">1000</td><td class="n">0</td><td class="mono">已用完</td><td class="sub">已耗尽</td></tr>
-        </tbody>
+        <tbody id="t-grants"></tbody>
       </table>
-      <div class="note mt12">「快过期先用」由调度器自动处理：<b>17.7 天后到期的那 97.89 分会优先被消耗</b>，不会浪费。</div>
     </div>
   </section>
-
-  <!-- ============ 数据看板 ============ -->  </section>
 
   <!-- ============ 数据看板 ============ -->
   <section class="page" id="p-dash">
     <div class="top">
-      <div><h1>数据看板</h1><p>按时间口径查看 KPI、账号用量透视与模型性能</p></div>
+      <div><h1>数据看板</h1><p>按时间口径查看 KPI、用量趋势与模型性能</p></div>
       <div class="tools">
-        <div class="seg" id="seg">
-          <button class="on">今日</button><button>本周</button><button>本月</button>
-          <button>全部</button><button>自定义</button>
+        <div class="seg" id="seg-range">
+          <button class="on" data-r="today">今日</button><button data-r="week">本周</button>
+          <button data-r="month">本月</button><button data-r="all">全部</button><button data-r="custom">自定义</button>
         </div>
-        <button class="btn s">刷新</button>
+        <button class="btn s" data-confirm="重新聚合全部用量数据。">刷新</button>
       </div>
     </div>
 
-    <div class="g g3">
-      <div class="card"><div class="lbl">请求数</div><div class="big">67</div><div class="kv mt8"><span>成功</span><b class="free">67（100%）</b></div></div>
-      <div class="card"><div class="lbl">tokens</div><div class="big">6.99<small>M</small></div><div class="kv mt8"><span>缓存命中</span><b>96.4%</b></div></div>
-      <div class="card"><div class="lbl">消耗积分</div><div class="big">14.95</div><div class="kv mt8"><span>折合参考</span><b>¥ 0.58</b></div></div>
-      <div class="card"><div class="lbl">平均耗时</div><div class="big">8.4<small>秒</small></div><div class="kv mt8"><span>生成速度</span><b>191 t/s</b></div></div>
+    <div class="g g4" id="kpi-row"></div>
+
+    <div class="g g2 mt">
+      <div class="card">
+        <div class="ct"><h3>调用趋势（按小时）</h3><span class="hint">柱高 = tokens · 悬停看明细</span></div>
+        <div class="chartbox" id="chart"></div>
+        <div class="xax" id="chart-x"></div>
+        <div class="note mt12" id="chart-note">—</div>
+      </div>
+      <div class="card">
+        <div class="ct"><h3>账号用量透视</h3></div>
+        <table>
+          <thead><tr><th>账号</th><th class="n">请求</th><th class="n">tokens</th><th class="n">积分</th><th class="n">占比</th></tr></thead>
+          <tbody id="t-acct"></tbody>
+        </table>
+        <div class="ct mt16"><h3>模型性能</h3></div>
+        <table>
+          <thead><tr><th>模型</th><th class="n">请求</th><th class="n">tokens</th><th class="n">速度</th><th class="n">积分</th></tr></thead>
+          <tbody id="t-perf"></tbody>
+        </table>
+      </div>
     </div>
 
-<div class="card mt">
-      <div class="ct"><h3>定价与取价状态</h3><button class="btn s">立即取价</button></div>
+    <div class="card mt">
+      <div class="ct"><h3>定价与取价状态</h3><button class="btn s" data-confirm="立即向 OpenRouter 取一次价，可能耗时几十秒。">立即取价</button></div>
       <div class="g g3">
         <div><div class="lbl">当前策略</div><div class="mono">632d48edd5ae</div></div>
         <div><div class="lbl">上次取价</div><div><b>16:40</b> · 42 个模型</div></div>
         <div><div class="lbl">下次取价</div><div><b>21:40</b> · 每 5 小时</div></div>
       </div>
-      <div class="kv mt8"><span>未定价模型</span><b class="free">0 个</b></div>
+      <div class="kv mt8"><span>未定价模型</span><b class="tg g">0 个</b></div>
       <div class="kv"><span>来源</span><b>OpenRouter 公价折算人民币，仅作参考；真实扣费看积分</b></div>
       <div class="kv"><span>手动映射</span><b>可填「hub 模型 → OpenRouter id」运行期覆盖</b></div>
-    </div>
-
-    <div class="g g2 mt">
-      <div class="card">
-        <div class="ct"><h3>tokens 与积分（按小时）</h3><span class="hint">蓝=tokens　绿=积分</span></div>
-        <div class="chart">
-          <i style="height:18%"></i><i style="height:12%"></i><i style="height:9%"></i><i style="height:7%"></i>
-          <i style="height:6%"></i><i style="height:8%"></i><i style="height:11%"></i><i style="height:9%"></i>
-          <i style="height:100%" class="g" style2="" ></i><i style="height:74%"></i><i style="height:52%"></i><i style="height:31%"></i>
-          <i style="height:24%"></i><i style="height:19%"></i><i style="height:14%"></i><i style="height:10%"></i>
-        </div>
-        <div class="xax"><span>0</span><span>2</span><span>4</span><span>6</span><span>8</span><span>10</span><span>12</span><span>14</span><span>16</span><span>18</span><span>20</span><span>22</span></div>
-        <div class="note mt12">16 点那一根是全天的 <b>88%</b>：冷启动未命中缓存，单次 1.79~3.91 积分；之后命中率 98% 以上，单价掉到 0.10。</div>
-      </div>
-
-      <div class="card">
-        <div class="ct"><h3>账号用量透视</h3></div>
-        <table>
-          <thead><tr><th>账号</th><th class="n">请求</th><th class="n">tokens</th><th class="n">积分</th><th class="n">占比</th></tr></thead>
-          <tbody>
-            <tr><td>六只羊🐑</td><td class="n">67</td><td class="n">6.99M</td><td class="n">14.95</td><td class="n">100%</td></tr>
-            <tr><td>国际版账号</td><td class="n sub">—</td><td class="n sub">—</td><td class="n sub">—</td><td class="n sub">—</td></tr>
-          </tbody>
-        </table>
-        <div class="ct mt16"><h3>模型性能</h3></div>
-        <table>
-          <thead><tr><th>模型</th><th class="n">请求</th><th class="n">tokens</th><th class="n">速度</th><th class="n">积分</th></tr></thead>
-          <tbody>
-            <tr><td>deepseek-v4.1-flash</td><td class="n">67</td><td class="n">6.99M</td><td class="n">191 t/s</td><td class="n">14.95</td></tr>
-          </tbody>
-        </table>
-      </div>
     </div>
   </section>
 
   <!-- ============ 智能体配置 ============ -->
   <section class="page" id="p-agent">
-    <div class="top">
-      <div><h1>智能体配置</h1><p>检测本机已装的 AI 客户端，一键把配置指向本网关；改前自动备份，随时字节级还原</p></div>
-    </div>
-
-    <div class="g g2">
-      <div class="cli">
-        <div class="ic" style="background:#10a37f">CX</div>
-        <div style="flex:1"><h4>Codex CLI / 桌面版</h4>
-          <p>已配置 · base_url <span class="mono">http://127.0.0.1:8788/v1</span> · wire_api <span class="mono">responses</span></p></div>
-        <span class="tg g">使用中</span>
-        <div class="sp"></div>
-        <button class="btn s">一键还原</button>
-      </div>
-      <div class="cli">
-        <div class="ic" style="background:#d97757">CC</div>
-        <div style="flex:1"><h4>Claude Code</h4>
-          <p>未配置 · 将指向 <span class="mono">ANTHROPIC_BASE_URL</span></p></div>
-        <span class="tg">未接入</span>
-        <div class="sp"></div>
-        <button class="btn s p">一键配置</button>
-      </div>
-      <div class="cli">
-        <div class="ic" style="background:#5b6cff">DS</div>
-        <div style="flex:1"><h4>DeepSeek Harness</h4>
-          <p>未配置 · 将写入 <span class="mono">~/.dsh/settings.yaml</span></p></div>
-        <span class="tg">未接入</span>
-        <div class="sp"></div>
-        <button class="btn s">一键配置</button>
-      </div>
-      <div class="cli">
-        <div class="ic" style="background:#8e8e93">ZC</div>
-        <div style="flex:1"><h4>ZCode / Crush / OpenCode</h4>
-          <p>未检测到安装</p></div>
-        <span class="tg">未安装</span>
-        <div class="sp"></div>
-        <button class="btn s" disabled>一键配置</button>
-      </div>
-    </div>
-
+    <div class="top"><div><h1>智能体配置</h1><p>检测本机已装的 AI 客户端，一键把配置指向本网关；改前自动备份，可字节级还原</p></div></div>
+    <div class="g g2" id="cli-list"></div>
     <div class="card mt">
       <div class="ct"><h3>配置说明</h3></div>
       <div class="note">写入前自动备份到 <span class="mono">accounts/agent-backups/&lt;客户端&gt;/</span>，每文件保留最新 10 份，<b>首次接入的原件永久保留</b>；多文件客户端两阶段写入，任一失败立即回退。还原是字节级写回原件，不是「猜着改回去」。</div>
-      <div class="note warnbox mt12"><b>注意</b>：面板的一键配置只在<b>网关本机</b>且用 <span class="mono">127.0.0.1</span> 打开时可用。客户端装在别的机器上时，改用配置器 CLI：<span class="mono">python wb_agents.py apply --client codex --base-url http://网关IP:8788/v1 --key sk-...</span></div>
+      <div class="note warnbox mt12"><b>注意</b>：一键配置只在<b>网关本机</b>且用 <span class="mono">127.0.0.1</span> 打开时可用。客户端在别的机器时改用 CLI：<span class="mono">python wb_agents.py apply --client codex --base-url http://网关IP:8788/v1 --key sk-...</span></div>
     </div>
   </section>
 
@@ -569,26 +543,15 @@ tbody tr:hover td{background:rgba(0,0,0,.018)}
     <div class="top">
       <div><h1>运行日志</h1><p>请求链路、上游调用与后台调度，最新在前</p></div>
       <div class="tools">
-        <div class="seg"><button class="on">全部</button><button>仅警告</button><button>仅错误</button></div>
-        <button class="btn s">清空</button><button class="btn s">导出</button>
+        <input class="inp" id="log-q" placeholder="搜索日志…" style="max-width:200px" />
+        <div class="seg" id="seg-log">
+          <button class="on" data-l="all">全部</button><button data-l="w">警告+</button><button data-l="e">仅错误</button>
+        </div>
+        <button class="btn s dgr" data-confirm="清空后无法恢复（导出过的除外）。确定清空全部日志？">清空</button>
+        <button class="btn s">导出</button>
       </div>
     </div>
-    <div class="card">
-      <div class="log">
-        <div><t>17:31:58</t><b class="i">INFO</b><p>chat done: model=deepseek-v4.1-flash acct=0d184d35 3870ms tokens=131787 (in=131604 out=183) 120.39t/s</p></div>
-        <div><t>17:31:49</t><b class="i">INFO</b><p>responses: model=deepseek-v4.1-flash stream=True msgs=158 effort='high' tools=141/18</p></div>
-        <div><t>17:22:36</t><b class="i">INFO</b><p>chat done: model=deepseek-v4.1-flash acct=0d184d35 42314ms tokens=247350 (in=238595 out=8755) 234.82t/s</p></div>
-        <div><t>17:22:28</t><b class="w">WARN</b><p>webtools: search cache hit for '北京时间 现在几点 在线时钟'</p></div>
-        <div><t>17:22:14</t><b class="i">INFO</b><p>web tool web_search -&gt; 1083 chars, 5 citeable source(s)</p></div>
-        <div><t>17:22:05</t><b class="i">INFO</b><p>webtools: search 'current time in Beijing China now' served by bing (376 ms, 5 results)</p></div>
-        <div><t>16:50:45</t><b class="i">INFO</b><p>alias: background model gpt-5.6-terra -&gt; deepseek-v4.1-flash</p></div>
-        <div><t>16:50:44</t><b class="i">INFO</b><p>chat done: model=deepseek-v4.1-flash acct=0d184d35 42314ms tokens=247350 (in=238595 out=8755)</p></div>
-        <div><t>16:50:12</t><b class="i">INFO</b><p>responses: model=deepseek-v4.1-flash stream=False msgs=152 effort=None tools=141/18</p></div>
-        <div><t>16:40:39</t><b class="i">INFO</b><p>catalog refresh: cn updated from the product-config endpoint (16 models)</p></div>
-        <div><t>16:23:50</t><b class="i">INFO</b><p>listening : http://127.0.0.1:8788/v1  (api key: off)</p></div>
-        <div><t>16:23:50</t><b class="w">WARN</b><p>panel : password is still the default 'admin' - change it in the panel</p></div>
-      </div>
-    </div>
+    <div class="card"><div class="log" id="log-box"></div></div>
   </section>
 
   <!-- ============ 设置 ============ -->
@@ -598,19 +561,18 @@ tbody tr:hover td{background:rgba(0,0,0,.018)}
       <div class="card">
         <div class="ct"><h3>面板与密钥</h3></div>
         <div class="set"><div><h4>面板密码</h4><p>当前仍是默认值，建议修改</p></div>
-          <div class="row"><input class="inp" type="password" value="admin" /><button class="btn s p">保存</button></div></div>
-        <div class="set"><div><h4>API Key</h4><p>网关当前未开启鉴权（仅监听本机）</p></div>
-          <div class="sw on"></div></div>
-        <div class="set"><div><h4>界面语言</h4><p>跟随面板设置</p></div>
-          <div class="seg"><button class="on">中文</button><button>EN</button></div></div>
+          <div class="row"><input class="inp" type="password" value="admin" /><button class="btn s p" data-confirm="修改后面板需要重新登录。">保存</button></div></div>
+        <div class="set"><div><h4>API Key 鉴权</h4><p>网关当前未开启（仅监听本机）</p></div><div class="sw" data-confirm="开启后所有 /v1 请求都要带 Bearer Key。"></div></div>
+        <div class="set"><div><h4>界面主题</h4><p>浅色 / 深色 / 跟随系统</p></div>
+          <div class="seg" id="seg-theme"><button class="on" data-t="light">浅色</button><button data-t="dark">深色</button><button data-t="auto">跟随</button></div></div>
       </div>
       <div class="card">
         <div class="ct"><h3>计价与上游</h3></div>
         <div class="set"><div><h4>价格估算</h4><p>按 OpenRouter 公价折算人民币，仅作参考</p></div><div class="sw on"></div></div>
-        <div class="set"><div><h4>本地网络工具</h4><p>接管 Codex 的 web_search 声明，本地代跑</p></div><div class="sw on"></div></div>
+        <div class="set"><div><h4>本地网络工具</h4><p>接管 Codex 的 web_search 声明，本地代跑</p></div><div class="sw on" data-confirm="关闭后 Codex 的联网搜索会报 unsupported call。"></div></div>
         <div class="set"><div><h4>每日任务模型</h4><p>签到与日常对话使用的模型</p></div><input class="inp" value="deepseek-v4.1-flash" /></div>
         <div class="set"><div><h4>后台模型改写</h4><p>把客户端后台任务指向免费模型，避免偷扣积分</p></div>
-          <div class="row"><input class="inp" value="hy3（免费）" /><button class="btn s">保存</button></div></div>
+          <div class="row"><input class="inp" value="hy3（免费）" /><button class="btn s" data-confirm="保存后重启网关生效。">保存</button></div></div>
       </div>
     </div>
   </section>
@@ -626,16 +588,16 @@ tbody tr:hover td{background:rgba(0,0,0,.018)}
         <div class="kv"><span>最小间隔</span><b>0.5 秒 · 缓存 600 秒</b></div>
         <div class="kv"><span>代跑轮数</span><b>最多 3 轮</b></div></div>
       <div class="card"><div class="ct"><h3>已配置服务</h3></div>
-        <div class="empty">暂无外部 MCP 服务。网关自身不依赖外部 MCP，客户端（如 Codex）的 MCP 由客户端自己管理。</div></div>
+        <div class="empty"><span class="ic">○</span>暂无外部 MCP 服务。网关自身不依赖外部 MCP，客户端（如 Codex）的 MCP 由客户端自己管理。</div></div>
     </div>
   </section>
 
   <section class="page" id="p-skill">
     <div class="top"><div><h1>Skills</h1><p>网关可下发给客户端的技能包</p></div></div>
     <div class="g g3">
-      <div class="card"><div class="ct"><h3>文档处理</h3><span class="tg g">内置</span></div><p class="sub fs12">读 docx / pdf / xlsx，抽取正文与表格。</p></div>
-      <div class="card"><div class="ct"><h3>联网检索</h3><span class="tg g">内置</span></div><p class="sub fs12">多引擎轮换搜索与页面抓取，结果带引用。</p></div>
-      <div class="card"><div class="ct"><h3>代码执行</h3><span class="tg o">可选</span></div><p class="sub fs12">沙箱内运行代码并回传结果。</p></div>
+      <div class="card"><div class="ct"><h3>文档处理</h3><span class="tg g">内置</span></div><p class="sub fs13">读 docx / pdf / xlsx，抽取正文与表格。</p></div>
+      <div class="card"><div class="ct"><h3>联网检索</h3><span class="tg g">内置</span></div><p class="sub fs13">多引擎轮换搜索与页面抓取，结果带引用。</p></div>
+      <div class="card"><div class="ct"><h3>代码执行</h3><span class="tg o">可选</span></div><p class="sub fs13">沙箱内运行代码并回传结果。</p></div>
     </div>
   </section>
 
@@ -644,20 +606,19 @@ tbody tr:hover td{background:rgba(0,0,0,.018)}
       <div class="tools"><button class="btn">+ 新建预设</button></div></div>
     <div class="card">
       <div class="ct"><h3>默认系统提示</h3><span class="hint">上游要求必须有 system 消息</span></div>
-      <div class="mono" style="background:rgba(0,0,0,.03);padding:12px;border-radius:10px;line-height:1.8">You are a helpful assistant.</div>
+      <div class="mono" style="background:rgba(128,128,128,.1);padding:12px;border-radius:10px;line-height:1.8">You are a helpful assistant.</div>
       <div class="note mt12">客户端没带 system 时用它兜底。Codex 自带很长的指令，通常用不到这里。</div>
     </div>
   </section>
 
   <section class="page" id="p-conv">
-    <div class="top"><div><h1>会话</h1><p>按对话归集的用量（与右下角浮窗同源）</p></div></div>
+    <div class="top"><div><h1>会话</h1><p>按对话归集的用量，与看板右下角浮窗同源</p></div>
+      <div class="tools"><button class="btn s" data-confirm="重新扫描 Codex 会话文件并与网关流水对账。">刷新</button></div></div>
     <div class="card">
-      <div class="ct"><h3>最近对话</h3><button class="btn s">刷新</button></div>
+      <div class="ct"><h3>最近对话</h3><span class="hint" id="conv-hint">—</span></div>
       <table>
         <thead><tr><th>结束</th><th class="n">请求</th><th class="n">轮次</th><th class="n">tokens</th><th class="n">积分</th></tr></thead>
-        <tbody>
-          <tr><td class="mono">今天 17:31</td><td class="n">58</td><td class="n">5</td><td class="n">6,988,972</td><td class="n">14.95</td></tr>
-        </tbody>
+        <tbody id="t-conv"></tbody>
       </table>
       <div class="note mt12">归集方式：网关流水 + Codex 会话文件按 token 数配对，Codex 没记的续写按对话时间区间吸收。<b>只读，不改任何一方代码。</b></div>
     </div>
@@ -669,13 +630,13 @@ tbody tr:hover td{background:rgba(0,0,0,.018)}
       <div class="card"><div class="ct"><h3>当前账号凭证</h3></div>
         <div class="kv"><span>来源</span><b>桌面客户端导入</b></div>
         <div class="kv"><span>文件</span><b class="mono">accounts/0d184d35….json</b></div>
-        <div class="kv"><span>refreshToken</span><b class="free">有效</b></div>
+        <div class="kv"><span>refreshToken</span><b class="tg g">有效</b></div>
         <div class="kv"><span>到期</span><b>30 天后</b></div>
-        <div class="kv"><span>存储方式</span><b class="bad">明文落盘</b></div>
+        <div class="kv"><span>存储方式</span><b class="tg r">明文落盘</b></div>
         <div class="note warnbox mt12"><b>该目录含长期访问权</b>：不要外传、不要放进同步盘与备份。不用时在此删除账号。</div></div>
       <div class="card"><div class="ct"><h3>重新授权</h3></div>
-        <div class="row"><button class="btn p">从桌面客户端导入</button><button class="btn">浏览器登录</button></div>
-        <p class="sub fs12 mt12">导入需要 WorkBuddy 客户端正在运行且已登录（Windows 上要从进程内存取解密密钥）。</p></div>
+        <div class="row w"><button class="btn p" data-confirm="需要 WorkBuddy 客户端正在运行且已登录。">从桌面端导入</button><button class="btn" data-confirm="将打开浏览器走 OAuth 流程。">浏览器登录</button></div>
+        <p class="sub fs12 mt12">Windows 上要从客户端进程内存取解密密钥，只读、不写入。</p></div>
     </div>
   </section>
 
@@ -685,38 +646,455 @@ tbody tr:hover td{background:rgba(0,0,0,.018)}
       <div class="ct"><h3>24 小时窗口</h3><span class="hint">预算取撞线账号的平均用量</span></div>
       <table>
         <thead><tr><th>账号</th><th>模型</th><th class="n">已用</th><th class="n">预算</th><th class="n">剩余</th></tr></thead>
-        <tbody>
-          <tr><td>六只羊🐑</td><td>deepseek-v4.1-flash</td><td class="n">14.95</td><td class="n">60.00</td><td class="n free">45.05</td></tr>
-        </tbody>
+        <tbody id="t-usage"></tbody>
       </table>
     </div>
   </section>
 
 </main>
 
+<!-- 底部浮动工具条 -->
+<div class="dock">
+  <button title="刷新全部" id="dock-refresh"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 12a8 8 0 11-3-6.2"/><path d="M21 3v5h-5"/></svg></button>
+  <button title="切换主题" id="dock-theme"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 12.8A9 9 0 1111.2 3a7 7 0 009.8 9.8z"/></svg></button>
+  <button title="导出今日流水" id="dock-export"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3v12M7 10l5 5 5-5"/><path d="M4 20h16"/></svg></button>
+  <button title="数据看板" id="dock-dash"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg></button>
+  <button title="设置" id="dock-set"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg></button>
+</div>
+
+<div class="tip" id="tip"></div>
+<div class="mask" id="mask"><div class="dlg">
+  <h3 id="dlg-t"></h3><p id="dlg-p"></p>
+  <div class="row"><button class="btn" id="dlg-no">取消</button><button class="btn p" id="dlg-yes">确定</button></div>
+</div></div>
+<div class="toast" id="toast"></div>
+
 <script>
+/* ============================================================
+   数据层：当前为示例值。
+   接进网关后只需替换 fetchData()，三个现成接口：
+     /accounts/credits → credits / checkin / grants / accounts
+     /sessions         → conversations
+     /v1/models        → models
+   渲染逻辑不用动。
+   ============================================================ */
+var DATA = {
+  meta:{ realm:'cn', realmLabel:'国内版 cn', host:'127.0.0.1:8788', catalogSource:'remote' },
+  credits:{ remain:2525.81, used:800.19, size:3326 },
+  checkin:{ streak:17, daily:100, todayDone:true },
+  today:{ credit:14.95, requests:58, tokens:6988972, gain:130 },
+  expire:{ days:30, date:'2026-11-16' },
+  accounts:[
+    { name:'六只羊🐑', realm:'国内版', domain:'copilot.tencent.com', source:'桌面端导入',
+      status:'online', daysLeft:30, credits:2525.81, weight:1, enabled:true }
+  ],
+  hourly:[
+    {h:0,t:0,c:0},{h:1,t:0,c:0},{h:2,t:0,c:0},{h:3,t:0,c:0},{h:4,t:0,c:0},{h:5,t:0,c:0},
+    {h:6,t:0,c:0},{h:7,t:0,c:0},{h:8,t:0,c:0},{h:9,t:0,c:0},{h:10,t:0,c:0},{h:11,t:0,c:0},
+    {h:12,t:0,c:0},{h:13,t:0,c:0},{h:14,t:0,c:0},{h:15,t:0,c:0},
+    {h:16,t:5301234,c:11.09},{h:17,t:1688738,c:3.86},{h:18,t:0,c:0},{h:19,t:0,c:0},
+    {h:20,t:0,c:0},{h:21,t:0,c:0},{h:22,t:0,c:0},{h:23,t:0,c:0}
+  ],
+  recent:[
+    {time:'17:31:58',model:'deepseek-v4.1-flash',prompt:242262,completion:1263,total:243525,credit:0.14,cache:99.9},
+    {time:'17:31:49',model:'deepseek-v4.1-flash',prompt:241788,completion:459,total:242247,credit:0.10,cache:99.7},
+    {time:'17:22:36',model:'deepseek-v4.1-flash',prompt:146649,completion:1026,total:147675,credit:0.10,cache:99.9},
+    {time:'17:22:28',model:'deepseek-v4.1-flash',prompt:145392,completion:1189,total:146581,credit:0.15,cache:98.2},
+    {time:'17:22:20',model:'deepseek-v4.1-flash',prompt:141900,completion:831,total:142731,credit:0.09,cache:99.9},
+    {time:'16:50:44',model:'deepseek-v4.1-flash',prompt:238595,completion:8755,total:247350,credit:3.91,cache:0},
+    {time:'16:50:12',model:'deepseek-v4.1-flash',prompt:122586,completion:635,total:123221,credit:1.79,cache:0}
+  ],
+  models:[
+    {id:'hy4-preview',rate:0.29,ctx:960000,levels:['high']},
+    {id:'hy3',rate:0,ctx:192000,levels:['low','high']},
+    {id:'deepseek-v4.1-flash',rate:0.11,ctx:1000000,levels:['low','high','max']},
+    {id:'glm-5.3',rate:0.79,ctx:1000000,levels:['low','high','max']},
+    {id:'glm-5.3-flash',rate:0.06,ctx:1000000,levels:['low','high','max']},
+    {id:'glm-5.2',rate:0.79,ctx:1000000,levels:['high','xhigh']},
+    {id:'glm-5.1',rate:0.79,ctx:200000,levels:[]},
+    {id:'glm-5v-turbo',rate:0.71,ctx:200000,levels:[]},
+    {id:'minimax-m3',rate:0.25,ctx:512000,levels:[]},
+    {id:'kimi-k3-1',rate:1.62,ctx:1000000,levels:['low','high','xhigh']},
+    {id:'kimi-k2.8-preview',rate:0.77,ctx:1000000,levels:['low','high','max']},
+    {id:'kimi-k2.7',rate:0.57,ctx:256000,levels:[]},
+    {id:'kimi-k2.6',rate:0.52,ctx:256000,levels:[]},
+    {id:'deepseek-v4-pro',rate:0.51,ctx:1000000,levels:['high','xhigh']},
+    {id:'step-5-preview',rate:0,ctx:1000000,levels:['low','medium','high']},
+    {id:'space-bunny',rate:0.08,ctx:1000000,levels:['low','medium','high','xhigh','max']}
+  ],
+  scheduler:{ enabled:true, next:'今日 21:00', last:'今日 09:00 · 签到成功 +100' },
+  grants:[
+    {name:'CodeBuddy个人版裂变包',at:'2026-10-11',size:300,left:97.89,exp:'2026-11-04',st:'使用中'},
+    {name:'每日签到奖励',at:'今日 00:12',size:100,left:100,exp:'长期',st:'可用'},
+    {name:'连签第 7 天奖励',at:'2026-10-15',size:1000,left:0,exp:'已用完',st:'已耗尽'}
+  ],
+  tasks:[
+    {n:'每日签到',d:'每天一次，连签有额外奖励',done:true},
+    {n:'每日活跃对话',d:'与任意模型完成一轮对话',done:true},
+    {n:'探索新模型',d:'使用一个本周没用过的模型',done:false},
+    {n:'分享邀请',d:'邀请好友注册并激活',done:false}
+  ],
+  clients:[
+    {n:'Codex CLI / 桌面版',ab:'CX',color:'#10a37f',desc:'已配置 · base_url http://127.0.0.1:8788/v1 · wire_api responses',tag:'使用中',tagCls:'g',action:'一键还原',confirm:'会把该客户端配置写回首次接入前的原件，之后需要重新配置。',primary:false},
+    {n:'Claude Code',ab:'CC',color:'#d97757',desc:'未配置 · 将指向 ANTHROPIC_BASE_URL',tag:'未接入',tagCls:'',action:'一键配置',confirm:'将把该客户端配置指向本网关，原文件会自动备份。',primary:true},
+    {n:'DeepSeek Harness',ab:'DS',color:'#5b6cff',desc:'未配置 · 将写入 ~/.dsh/settings.yaml',tag:'未接入',tagCls:'',action:'一键配置',confirm:'将把该客户端配置指向本网关，原文件会自动备份。',primary:false},
+    {n:'ZCode / Crush / OpenCode',ab:'ZC',color:'#8e8e93',desc:'未检测到安装',tag:'未安装',tagCls:'',action:'一键配置',confirm:'',primary:false,disabled:true}
+  ],
+  conversations:[
+    {when:'今天 17:31',requests:58,turns:5,tokens:6988972,credit:14.95}
+  ],
+  logs:[
+    {t:'17:31:58',l:'i',m:'chat done: model=deepseek-v4.1-flash acct=0d184d35 3870ms tokens=131787 (in=131604 out=183) 120.39t/s'},
+    {t:'17:31:49',l:'i',m:'responses: model=deepseek-v4.1-flash stream=True msgs=158 effort=high tools=141/18'},
+    {t:'17:22:36',l:'i',m:'chat done: model=deepseek-v4.1-flash acct=0d184d35 42314ms tokens=247350 (in=238595 out=8755)'},
+    {t:'17:22:28',l:'w',m:'webtools: search cache hit for 北京时间 现在几点 在线时钟'},
+    {t:'17:22:14',l:'i',m:'web tool web_search -> 1083 chars, 5 citeable source(s)'},
+    {t:'17:22:05',l:'i',m:'webtools: search current time in Beijing China now served by bing (376 ms, 5 results)'},
+    {t:'16:50:45',l:'i',m:'alias: background model gpt-5.6-terra -> deepseek-v4.1-flash'},
+    {t:'16:50:44',l:'i',m:'chat done: model=deepseek-v4.1-flash acct=0d184d35 42314ms tokens=247350 (in=238595 out=8755)'},
+    {t:'16:50:12',l:'i',m:'responses: model=deepseek-v4.1-flash stream=False msgs=152 tools=141/18'},
+    {t:'16:40:39',l:'i',m:'catalog refresh: cn updated from the product-config endpoint (16 models)'},
+    {t:'16:23:50',l:'w',m:'panel: password is still the default admin - change it in the panel'},
+    {t:'16:23:50',l:'i',m:'listening : http://127.0.0.1:8788/v1  (api key: off)'}
+  ]
+};
+
+/* ============ 工具函数 ============ */
+function $(id){return document.getElementById(id);}
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
+function cn(n){                                  // 中文大数字
+  if(n>=1e8) return (n/1e8).toFixed(2)+' 亿';
+  if(n>=1e4) return (n/1e4).toFixed(n>=1e6?0:1)+' 万';
+  return n.toLocaleString();
+}
+function cr(v){ if(!v) return '0'; return (Math.round(v*100)/100).toString(); }
+function rate(v){ return v===0 ? 'x0.00' : 'x'+String(v); }
+
+/* ============ 渲染 ============ */
+var sortState={recent:{k:'time',d:-1},models:{k:'rate',d:1}};
+
+function renderTop(){
+  var c=DATA.credits;
+  $('v-remain').innerHTML=c.remain.toFixed(2)+'<small>积分</small>';
+  $('v-size').textContent=c.size.toLocaleString();
+  $('v-used').textContent=c.used.toLocaleString();
+  var pct=c.size?Math.round(c.used/c.size*100):0;
+  $('v-pct').textContent=pct+'%';
+  var bar=$('v-bar'); bar.style.width=pct+'%';
+  bar.parentNode.className='bar mt12'+(pct>85?' o':'');
+  $('v-expire').innerHTML='凭证 <b>'+DATA.expire.days+' 天</b>后到期（'+DATA.expire.date+'）';
+
+  $('v-today').innerHTML=DATA.today.credit.toFixed(2)+'<small>积分</small>';
+  $('v-treq').textContent=DATA.today.requests+' 次';
+  $('v-ttok').textContent=cn(DATA.today.tokens);
+
+  $('v-streak').innerHTML=DATA.checkin.streak+'<small>天</small>';
+  $('v-streak2').innerHTML=DATA.checkin.streak+'<small>天</small>';
+  $('v-checkin').textContent=DATA.checkin.todayDone?'已签到':'未签到';
+  $('v-daily').textContent='+'+DATA.checkin.daily;
+  $('v-gain').innerHTML='+'+DATA.today.gain;
+  $('v-expdays').innerHTML='17<small>天后</small>';
+
+  $('rail-credits').textContent='余额 '+c.remain.toFixed(2);
+  $('rail-host').textContent=DATA.meta.host;
+  $('v-realm').textContent=DATA.meta.realmLabel;
+  $('v-mcount').textContent=DATA.models.length+' 个 · 来自上游 API';
+  $('cat-src').textContent='catalog: '+DATA.meta.catalogSource;
+  $('sched-next').textContent=DATA.scheduler.next;
+  $('sched-last').textContent=DATA.scheduler.last;
+  $('recent-hint').textContent='共 '+DATA.recent.length+' 条';
+  $('acc-hint').textContent=DATA.accounts.length+' 个账号';
+  $('conv-hint').textContent=DATA.conversations.length+' 次对话';
+}
+
+function renderAccounts(){
+  if(!DATA.accounts.length){
+    $('acc-cards').innerHTML='<div class="empty" style="grid-column:1/-1"><span class="ic">○</span>还没有账号。<br>点右上角「从桌面端导入」或「添加账号」。</div>';
+    return;
+  }
+  var h='';
+  for(var i=0;i<DATA.accounts.length;i++){
+    var a=DATA.accounts[i];
+    var pct=a.daysLeft>=30?100:Math.max(4,Math.round(a.daysLeft/30*100));
+    var soon=a.daysLeft<7;
+    h+='<div class="hc">'
+      +'<div class="hd"><div class="av">'+esc(a.name.slice(0,1))+'</div><b>'+esc(a.name)+'</b>'
+      +'<span class="tg '+(a.status==='online'?'g':'r')+'">'+(a.status==='online'?'在线':'异常')+'</span></div>'
+      +'<div class="m">'+esc(a.realm)+' · '+esc(a.source)+' · 权重 '+a.weight+'</div>'
+      +'<div class="m mono">'+esc(a.domain)+'</div>'
+      +'<div class="row b mt8 fs12 sub"><span>剩余 '+a.daysLeft+' 天</span><span><b class="v">'+a.credits.toFixed(2)+'</b> 积分</span></div>'
+      +'<div class="bar'+(soon?' o':'')+'"><i style="width:'+pct+'%"></i></div>'
+      +'</div>';
+  }
+  $('acc-cards').innerHTML=h;
+}
+
+function renderRecent(){
+  var s=sortState.recent, rows=DATA.recent.slice();
+  rows.sort(function(a,b){
+    var x=a[s.k],y=b[s.k];
+    return (typeof x==='string'? x.localeCompare(y) : x-y)*s.d;
+  });
+  var h='';
+  if(!rows.length){ h='<tr><td colspan="7" class="empty">今天还没有请求</td></tr>'; }
+  for(var i=0;i<rows.length;i++){
+    var r=rows[i], hot=r.cache<50;
+    h+='<tr><td class="mono">'+esc(r.time)+'</td><td>'+esc(r.model)+'</td>'
+      +'<td class="n">'+r.prompt.toLocaleString()+'</td><td class="n">'+r.completion.toLocaleString()+'</td>'
+      +'<td class="n">'+r.total.toLocaleString()+'</td>'
+      +'<td class="n'+(hot?' bad':'')+'">'+cr(r.credit)+'</td>'
+      +'<td class="n'+(r.cache>90?'':' warn')+'">'+r.cache.toFixed(1)+'%</td></tr>';
+  }
+  $('t-recent').querySelector('tbody').innerHTML=h;
+  markSort('t-recent','recent');
+}
+
+function renderModels(){
+  var q=($('model-q').value||'').toLowerCase();
+  var s=sortState.models, rows=DATA.models.filter(function(m){
+    return !q || m.id.toLowerCase().indexOf(q)>=0;
+  });
+  rows.sort(function(a,b){ return (a[s.k]>b[s.k]?1:a[s.k]<b[s.k]?-1:0)*s.d; });
+  var h='';
+  if(!rows.length){ h='<tr><td colspan="4" class="empty">没有匹配的模型</td></tr>'; }
+  for(var i=0;i<rows.length;i++){
+    var m=rows[i];
+    h+='<tr><td>'+esc(m.id)+(m.rate===0?' <span class="tg g">免费</span>':'')+'</td>'
+      +'<td class="n" style="'+(m.rate===0?'color:var(--green);font-weight:600':'')+'">'+rate(m.rate)+'</td>'
+      +'<td class="n">'+m.ctx.toLocaleString()+'</td>'
+      +'<td class="fs12 sub">'+(m.levels.length?m.levels.join(' / '):'—')+'</td></tr>';
+  }
+  $('t-models').querySelector('tbody').innerHTML=h;
+  markSort('t-models','models');
+}
+
+function markSort(tblId,key){
+  var ths=$(tblId).querySelectorAll('th.sortable');
+  for(var i=0;i<ths.length;i++){
+    var ar=ths[i].querySelector('.ar'); if(!ar) continue;
+    if(ths[i].getAttribute('data-k')===sortState[key].k){ ar.textContent=sortState[key].d>0?'▴':'▾'; }
+    else { ar.textContent=''; }
+  }
+}
+
+function renderChart(){
+  var hs=DATA.hourly, max=0, i;
+  for(i=0;i<hs.length;i++){ if(hs[i].t>max) max=hs[i].t; }
+  var box=$('chart'), x=$('chart-x');
+  if(max===0){
+    box.innerHTML='<div class="empty" style="width:100%"><span class="ic">○</span>今天还没有调用，趋势图等有数据后自动出现。</div>';
+    x.innerHTML=''; $('chart-note').textContent='';
+    return;
+  }
+  var h='', xh='', sum=0, cred=0, peak=hs[0];
+  for(i=0;i<hs.length;i++){
+    var pct=Math.round(hs[i].t/max*100);
+    h+='<i data-h="'+hs[i].h+'" data-t="'+hs[i].t+'" data-c="'+hs[i].c+'" style="height:'+Math.max(pct,2)+'%"'+(hs[i].t===0?' class="z"':'')+'></i>';
+    xh+='<span>'+(i%3===0?hs[i].h:'')+'</span>';
+    sum+=hs[i].t; cred+=hs[i].c;
+    if(hs[i].t>peak.t) peak=hs[i];
+  }
+  box.innerHTML=h; x.innerHTML=xh;
+  $('chart-note').innerHTML='峰值在 <b>'+peak.h+':00</b>（'+cn(peak.t)+' tokens，'+cr(peak.c)+' 积分）；全天 '+cn(sum)+' tokens / '+cr(cred)+' 积分。';
+  bindTip(box);
+}
+
+function bindTip(box){
+  var tip=$('tip'), bars=box.querySelectorAll('i[data-h]');
+  for(var i=0;i<bars.length;i++){
+    bars[i].addEventListener('mouseenter',function(e){
+      var d=e.target.dataset;
+      tip.innerHTML='<b>'+d.h+':00</b>　'+cn(+d.t)+' tokens　'+cr(+d.c)+' 积分';
+      tip.classList.add('on');
+    });
+    bars[i].addEventListener('mousemove',function(e){
+      tip.style.left=Math.min(e.clientX+14, window.innerWidth-190)+'px';
+      tip.style.top=(e.clientY-46)+'px';
+    });
+    bars[i].addEventListener('mouseleave',function(){ tip.classList.remove('on'); });
+  }
+}
+
+function renderKpi(){
+  var t=DATA.today, c=DATA.credits;
+  var cards=[
+    {l:'请求数',v:t.requests,s:'次',x:'成功率 100%'},
+    {l:'tokens',v:cn(t.tokens),s:'',x:'缓存命中 96.4%'},
+    {l:'消耗积分',v:t.credit.toFixed(2),s:'',x:'余额剩 '+c.remain.toFixed(2)},
+    {l:'平均耗时',v:'8.4',s:'秒',x:'生成速度 191 t/s'}
+  ];
+  var h='';
+  for(var i=0;i<cards.length;i++){
+    var k=cards[i];
+    h+='<div class="card"><div class="lbl">'+k.l+'</div><div class="big">'+k.v+(k.s?'<small>'+k.s+'</small>':'')+'</div>'
+      +'<div class="mt8 fs12 sub">'+k.x+'</div></div>';
+  }
+  $('kpi-row').innerHTML=h;
+}
+
+function renderTables(){
+  $('t-acct').innerHTML='<tr><td>六只羊🐑</td><td class="n">67</td><td class="n">699 万</td><td class="n">14.95</td><td class="n">100%</td></tr>'
+    +'<tr><td class="sub">国际版账号</td><td class="n sub">—</td><td class="n sub">—</td><td class="n sub">—</td><td class="n sub">—</td></tr>';
+  $('t-perf').innerHTML='<tr><td>deepseek-v4.1-flash</td><td class="n">67</td><td class="n">699 万</td><td class="n">191 t/s</td><td class="n">14.95</td></tr>';
+  $('t-usage').innerHTML='<tr><td>六只羊🐑</td><td>deepseek-v4.1-flash</td><td class="n">14.95</td><td class="n">60.00</td><td class="n" style="color:var(--green)">45.05</td></tr>';
+
+  var h='';
+  for(var i=0;i<DATA.grants.length;i++){
+    var g=DATA.grants[i];
+    var cls=g.st==='使用中'?'g':(g.st==='可用'?'b':'');
+    h+='<tr><td>'+esc(g.name)+'</td><td class="mono">'+esc(g.at)+'</td><td class="n">'+g.size+'</td>'
+      +'<td class="n">'+g.left.toFixed(2)+'</td><td class="mono">'+esc(g.exp)+'</td>'
+      +'<td><span class="tg '+cls+'">'+esc(g.st)+'</span></td></tr>';
+  }
+  $('t-grants').innerHTML=h;
+}
+
+function renderTasks(){
+  var h='';
+  for(var i=0;i<DATA.tasks.length;i++){
+    var t=DATA.tasks[i];
+    h+='<div class="row mt8"><div class="task" style="flex:1">'
+      +'<div class="ic'+(t.done?' g':'')+'">'+(t.done?'✓':'○')+'</div>'
+      +'<div><h4>'+esc(t.n)+'</h4><p>'+esc(t.d)+'</p></div>'
+      +'<div class="sp"></div><div class="chk'+(t.done?'':' no')+'">'+(t.done?'✓':'')+'</div>'
+      +'</div></div>';
+  }
+  $('task-list').innerHTML=h;
+}
+
+function renderClients(){
+  var h='';
+  for(var i=0;i<DATA.clients.length;i++){
+    var c=DATA.clients[i];
+    h+='<div class="cli"><div class="ic" style="background:'+c.color+'">'+c.ab+'</div>'
+      +'<div style="flex:1;min-width:190px"><h4>'+esc(c.n)+'</h4><p>'+esc(c.desc)+'</p></div>'
+      +'<span class="tg '+c.tagCls+'">'+esc(c.tag)+'</span>'
+      +'<button class="btn s'+(c.primary?' p':'')+'" '+(c.disabled?'disabled':'')
+      +' data-confirm="'+esc(c.confirm)+'">'+esc(c.action)+'</button></div>';
+  }
+  $('cli-list').innerHTML=h;
+}
+
+function renderConv(){
+  if(!DATA.conversations.length){
+    $('t-conv').innerHTML='<tr><td colspan="5" class="empty">还没有对话记录</td></tr>'; return;
+  }
+  var h='';
+  for(var i=0;i<DATA.conversations.length;i++){
+    var c=DATA.conversations[i];
+    h+='<tr'+(i===0?' style="font-weight:650"':'')+'><td>'+esc(c.when)+'</td><td class="n">'+c.requests+'</td>'
+      +'<td class="n">'+c.turns+'</td><td class="n">'+c.tokens.toLocaleString()+'</td><td class="n">'+cr(c.credit)+'</td></tr>';
+  }
+  $('t-conv').innerHTML=h;
+}
+
+var logFilter={q:'',l:'all'};
+function renderLog(){
+  var q=logFilter.q.toLowerCase(), lv=logFilter.l, h='', n=0;
+  for(var i=0;i<DATA.logs.length;i++){
+    var L=DATA.logs[i];
+    if(lv==='w' && L.l==='i') continue;
+    if(lv==='e' && L.l!=='e') continue;
+    if(q && L.m.toLowerCase().indexOf(q)<0 && L.t.indexOf(q)<0) continue;
+    n++;
+    h+='<div class="li"><t>'+esc(L.t)+'</t><b>'+({i:'INFO',w:'WARN',e:'ERROR',s:'DEBUG'})[L.l]+'</b><p>'+esc(L.m)+'</p></div>';
+  }
+  if(!n) h='<div class="empty"><span class="ic">○</span>没有匹配的日志</div>';
+  $('log-box').innerHTML=h;
+}
+
+function renderAll(){
+  renderTop(); renderAccounts(); renderRecent(); renderModels();
+  renderChart(); renderKpi(); renderTables(); renderTasks();
+  renderClients(); renderConv(); renderLog();
+}
+
+/* ============ 交互 ============ */
+function toast(msg){
+  var t=$('toast'); t.textContent=msg; t.classList.add('on');
+  clearTimeout(t._h); t._h=setTimeout(function(){t.classList.remove('on');},2200);
+}
+var dlgCb=null;
+function confirmDlg(title,text,cb){
+  $('dlg-t').textContent=title; $('dlg-p').textContent=text;
+  dlgCb=cb; $('mask').classList.add('on');
+}
+$('dlg-no').onclick=function(){ $('mask').classList.remove('on'); dlgCb=null; };
+$('dlg-yes').onclick=function(){
+  $('mask').classList.remove('on');
+  if(dlgCb){ dlgCb(); dlgCb=null; }
+  toast('已执行');
+};
+$('mask').addEventListener('click',function(e){ if(e.target===$('mask')){ $('mask').classList.remove('on'); dlgCb=null; } });
+
+document.addEventListener('click',function(e){
+  var el=e.target && e.target.closest ? e.target.closest('[data-confirm]') : null;
+  if(!el) return;
+  e.preventDefault();
+  confirmDlg('确认操作', el.getAttribute('data-confirm'), function(){});
+});
+
 document.querySelectorAll('.nav').forEach(function(n){
-  n.addEventListener('click', function(){
+  n.addEventListener('click',function(){
     document.querySelectorAll('.nav').forEach(function(x){x.classList.remove('on')});
     n.classList.add('on');
-    var p = n.getAttribute('data-p');
     document.querySelectorAll('.page').forEach(function(s){s.classList.remove('on')});
-    var el = document.getElementById('p-' + p);
-    if (el) el.classList.add('on');
-    document.querySelector('.main').scrollTop = 0;
+    $('p-'+n.getAttribute('data-p')).classList.add('on');
+    $('main').scrollTop=0;
   });
 });
+
 document.querySelectorAll('.sw').forEach(function(s){
-  s.addEventListener('click', function(){ s.classList.toggle('on'); });
+  s.addEventListener('click',function(){
+    var c=s.getAttribute('data-confirm');
+    if(c && s.classList.contains('on')){ confirmDlg('确认关闭',c,function(){ s.classList.remove('on'); }); return; }
+    s.classList.toggle('on');
+  });
 });
+
 document.querySelectorAll('.seg').forEach(function(seg){
   seg.querySelectorAll('button').forEach(function(b){
-    b.addEventListener('click', function(){
+    b.addEventListener('click',function(){
       seg.querySelectorAll('button').forEach(function(x){x.classList.remove('on')});
       b.classList.add('on');
+      if(seg.id==='seg-log'){ logFilter.l=b.getAttribute('data-l'); renderLog(); }
+      if(seg.id==='seg-theme'){ setTheme(b.getAttribute('data-t')); }
     });
   });
 });
+
+$('model-q').addEventListener('input',renderModels);
+$('log-q').addEventListener('input',function(){ logFilter.q=this.value; renderLog(); });
+
+document.querySelectorAll('th.sortable').forEach(function(th){
+  th.addEventListener('click',function(){
+    var tbl=th.closest('table').id, key=tbl==='t-recent'?'recent':'models';
+    var k=th.getAttribute('data-k');
+    if(sortState[key].k===k){ sortState[key].d*=-1; } else { sortState[key].k=k; sortState[key].d=1; }
+    if(key==='recent') renderRecent(); else renderModels();
+  });
+});
+
+function setTheme(t){
+  if(t==='auto'){ document.documentElement.removeAttribute('data-theme'); }
+  else { document.documentElement.setAttribute('data-theme',t); }
+  try{ localStorage.setItem('wb-theme',t); }catch(e){}
+  $('dock-theme').classList.toggle('on', document.documentElement.getAttribute('data-theme')==='dark');
+}
+$('dock-theme').onclick=function(){
+  var cur=document.documentElement.getAttribute('data-theme')||'light';
+  setTheme(cur==='dark'?'light':'dark');
+};
+$('dock-refresh').onclick=function(){ renderAll(); toast('已刷新'); };
+$('dock-export').onclick=function(){ confirmDlg('导出','把当前筛选出的请求流水导出为 CSV？',function(){}); };
+$('dock-dash').onclick=function(){ document.querySelector('.nav[data-p="dash"]').click(); };
+$('dock-set').onclick=function(){ document.querySelector('.nav[data-p="set"]').click(); };
+
+try{
+  var st=localStorage.getItem('wb-theme');
+  if(st) setTheme(st);
+}catch(e){}
+renderAll();
 </script>
 </body>
 </html>
