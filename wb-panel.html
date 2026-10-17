@@ -253,6 +253,13 @@ tbody tr:hover td{background:rgba(128,128,128,.07)}
 
 .page{display:none}
 .page.on{display:block}
+/* 模型清单：紧凑 / 详细 */
+#t-models .dcol{display:none}
+#t-models.detail .dcol{display:table-cell}
+#t-models td.dsub{display:none}
+#t-models.detail td.dsub{display:table-cell}
+.yn{color:var(--green);font-weight:600}
+.no2{color:var(--sub2)}
 
 /* ============ 响应式 ============ */
 @media (max-width:1240px){
@@ -279,7 +286,8 @@ tbody tr:hover td{background:rgba(128,128,128,.07)}
 <aside class="rail">
   <div class="brand">
     <div class="logo">W</div>
-    <div><b>WorkBuddy 网关</b><span id="rail-host">127.0.0.1:8788</span></div>
+    <div style="flex:1"><b>WorkBuddy 网关</b><span id="rail-host">127.0.0.1:8788</span></div>
+    <button class="btn s" id="rail-theme" title="切换深浅色" style="padding:5px 9px">&#9684;</button>
   </div>
   <div class="grp">基本功能</div>
   <div class="nav on" data-p="gw"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 12h4l3-8 4 16 3-8h4"/></svg><span>网关与账号</span></div>
@@ -383,7 +391,10 @@ tbody tr:hover td{background:rgba(128,128,128,.07)}
     <div class="card mt">
       <div class="ct"><h3>最近模型清单</h3>
         <div class="row">
-          <input class="inp" id="model-q" placeholder="搜索模型…" style="max-width:170px" />
+          <input class="inp" id="model-q" placeholder="搜索模型…" style="max-width:150px" />
+          <div class="seg" id="seg-model">
+            <button class="on" data-v="compact">紧凑</button><button data-v="detail">详细</button>
+          </div>
           <button class="btn s" data-confirm="立即向上游拉取一次模型目录（含最新倍率），约 1~3 秒。">刷新模型</button>
         </div></div>
       <div class="scroll" style="max-height:300px">
@@ -392,6 +403,8 @@ tbody tr:hover td{background:rgba(128,128,128,.07)}
             <th class="sortable" data-k="id">模型<span class="ar"></span></th>
             <th class="n sortable" data-k="rate">倍率<span class="ar"></span></th>
             <th class="n sortable" data-k="ctx">上下文<span class="ar"></span></th>
+            <th class="dcol">视觉</th><th class="dcol">工具</th><th class="dcol">推理</th>
+            <th class="dcol">厂商</th><th class="dcol">温度</th>
             <th>推理档位</th>
           </tr></thead>
           <tbody></tbody>
@@ -705,22 +718,22 @@ var DATA = {
     {time:'16:50:12',model:'deepseek-v4.1-flash',prompt:122586,completion:635,total:123221,credit:1.79,cache:0}
   ],
   models:[
-    {id:'hy4-preview',rate:0.29,ctx:960000,levels:['high']},
-    {id:'hy3',rate:0,ctx:192000,levels:['low','high']},
-    {id:'deepseek-v4.1-flash',rate:0.11,ctx:1000000,levels:['low','high','max']},
-    {id:'glm-5.3',rate:0.79,ctx:1000000,levels:['low','high','max']},
-    {id:'glm-5.3-flash',rate:0.06,ctx:1000000,levels:['low','high','max']},
-    {id:'glm-5.2',rate:0.79,ctx:1000000,levels:['high','xhigh']},
-    {id:'glm-5.1',rate:0.79,ctx:200000,levels:[]},
-    {id:'glm-5v-turbo',rate:0.71,ctx:200000,levels:[]},
-    {id:'minimax-m3',rate:0.25,ctx:512000,levels:[]},
-    {id:'kimi-k3-1',rate:1.62,ctx:1000000,levels:['low','high','xhigh']},
-    {id:'kimi-k2.8-preview',rate:0.77,ctx:1000000,levels:['low','high','max']},
-    {id:'kimi-k2.7',rate:0.57,ctx:256000,levels:[]},
-    {id:'kimi-k2.6',rate:0.52,ctx:256000,levels:[]},
-    {id:'deepseek-v4-pro',rate:0.51,ctx:1000000,levels:['high','xhigh']},
-    {id:'step-5-preview',rate:0,ctx:1000000,levels:['low','medium','high']},
-    {id:'space-bunny',rate:0.08,ctx:1000000,levels:['low','medium','high','xhigh','max']}
+    {id:'hy4-preview',rate:0.29,ctx:960000,levels:['high'],vision:1,tools:1,reason:1,vendor:'e',temp:'1',desc:'混元新一代预览，代码与日常通用'},
+    {id:'hy3',rate:0,ctx:192000,levels:['low','high'],vision:1,tools:1,reason:1,vendor:'e',temp:'1',desc:'免费档，轻量任务够用'},
+    {id:'deepseek-v4.1-flash',rate:0.11,ctx:1000000,levels:['low','high','max'],vision:1,tools:1,reason:1,vendor:'f',temp:'1',desc:'DeepSeek 旗舰，1M 上下文，原生多模态，强制推理'},
+    {id:'glm-5.3',rate:0.79,ctx:1000000,levels:['low','high','max'],vision:1,tools:1,reason:1,vendor:'z',temp:'1',desc:'智谱主力，长文档与工具调用稳'},
+    {id:'glm-5.3-flash',rate:0.06,ctx:1000000,levels:['low','high','max'],vision:0,tools:1,reason:1,vendor:'z',temp:'1',desc:'上游宣告多模态但读图通道未接入，实际按纯文本'},
+    {id:'glm-5.2',rate:0.79,ctx:1000000,levels:['high','xhigh'],vision:1,tools:1,reason:1,vendor:'z',temp:'1',desc:'上一代主力，兼容性好'},
+    {id:'glm-5.1',rate:0.79,ctx:200000,levels:[],vision:1,tools:1,reason:0,vendor:'z',temp:'1',desc:'GLM-5.1，非推理模型'},
+    {id:'glm-5v-turbo',rate:0.71,ctx:200000,levels:[],vision:1,tools:1,reason:0,vendor:'z',temp:'1',desc:'视觉加速版，读图快'},
+    {id:'minimax-m3',rate:0.25,ctx:512000,levels:[],vision:0,tools:1,reason:0,vendor:'m',temp:'1',desc:'MiniMax M3，中文对话自然'},
+    {id:'kimi-k3-1',rate:1.62,ctx:1000000,levels:['low','high','xhigh'],vision:1,tools:1,reason:1,vendor:'k',temp:'1',desc:'Kimi K3，长上下文阅读强，单价最高'},
+    {id:'kimi-k2.8-preview',rate:0.77,ctx:1000000,levels:['low','high','max'],vision:1,tools:1,reason:1,vendor:'k',temp:'1',desc:'K2.8 预览，性价比优于 K3'},
+    {id:'kimi-k2.7',rate:0.57,ctx:256000,levels:[],vision:1,tools:1,reason:0,vendor:'k',temp:'1',desc:'K2.7，中短上下文'},
+    {id:'kimi-k2.6',rate:0.52,ctx:256000,levels:[],vision:1,tools:1,reason:0,vendor:'k',temp:'1',desc:'K2.6，最便宜的一档 Kimi'},
+    {id:'deepseek-v4-pro',rate:0.51,ctx:1000000,levels:['high','xhigh'],vision:1,tools:1,reason:1,vendor:'d',temp:'1',desc:'DeepSeek V4 Pro，复杂推理更强'},
+    {id:'step-5-preview',rate:0,ctx:1000000,levels:['low','medium','high'],vision:0,tools:1,reason:1,vendor:'s',temp:'1',desc:'阶跃星辰预览，免费'},
+    {id:'space-bunny',rate:0.08,ctx:1000000,levels:['low','medium','high','xhigh','max'],vision:1,tools:1,reason:1,vendor:'x',temp:'1',desc:'低价位全能档，倍率仅 0.08'}
   ],
   scheduler:{ enabled:true, next:'今日 21:00', last:'今日 09:00 · 签到成功 +100' },
   grants:[
@@ -849,22 +862,36 @@ function renderRecent(){
   markSort('t-recent','recent');
 }
 
+var modelView='compact';
 function renderModels(){
   var q=($('model-q').value||'').toLowerCase();
   var s=sortState.models, rows=DATA.models.filter(function(m){
     return !q || m.id.toLowerCase().indexOf(q)>=0;
   });
   rows.sort(function(a,b){ return (a[s.k]>b[s.k]?1:a[s.k]<b[s.k]?-1:0)*s.d; });
+  var tbl=$('t-models');
+  tbl.classList.toggle('detail', modelView==='detail');
+  var span = modelView==='detail' ? 10 : 4;
+  var Y='<span class="yn">✓</span>', N='<span class="no2">—</span>';
   var h='';
-  if(!rows.length){ h='<tr><td colspan="4" class="empty">没有匹配的模型</td></tr>'; }
+  if(!rows.length){ h='<tr><td colspan="'+span+'" class="empty">没有匹配的模型</td></tr>'; }
   for(var i=0;i<rows.length;i++){
     var m=rows[i];
     h+='<tr><td>'+esc(m.id)+(m.rate===0?' <span class="tg g">免费</span>':'')+'</td>'
       +'<td class="n" style="'+(m.rate===0?'color:var(--green);font-weight:600':'')+'">'+rate(m.rate)+'</td>'
       +'<td class="n">'+m.ctx.toLocaleString()+'</td>'
+      +'<td class="dcol n">'+(m.vision?Y:N)+'</td>'
+      +'<td class="dcol n">'+(m.tools?Y:N)+'</td>'
+      +'<td class="dcol n">'+(m.reason?Y:N)+'</td>'
+      +'<td class="dcol">'+esc(m.vendor)+'</td>'
+      +'<td class="dcol n">'+esc(m.temp)+'</td>'
       +'<td class="fs12 sub">'+(m.levels.length?m.levels.join(' / '):'—')+'</td></tr>';
+    if(modelView==='detail'){
+      h+='<tr><td class="dsub" colspan="10" style="white-space:normal;padding-top:0;border-bottom:1px solid var(--line2)">'
+        +'<span class="fs12 sub">'+esc(m.desc||'')+'</span></td></tr>';
+    }
   }
-  $('t-models').querySelector('tbody').innerHTML=h;
+  tbl.querySelector('tbody').innerHTML=h;
   markSort('t-models','models');
 }
 
@@ -1064,6 +1091,18 @@ document.querySelectorAll('.seg').forEach(function(seg){
 });
 
 $('model-q').addEventListener('input',renderModels);
+$('rail-theme').onclick=function(){
+  var cur=document.documentElement.getAttribute('data-theme')||'light';
+  setTheme(cur==='dark'?'light':'dark');
+};
+document.querySelectorAll('#seg-model button').forEach(function(b){
+  b.addEventListener('click',function(){
+    document.querySelectorAll('#seg-model button').forEach(function(x){x.classList.remove('on')});
+    b.classList.add('on');
+    modelView=b.getAttribute('data-v');
+    renderModels();
+  });
+});
 $('log-q').addEventListener('input',function(){ logFilter.q=this.value; renderLog(); });
 
 document.querySelectorAll('th.sortable').forEach(function(th){
