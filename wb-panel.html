@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>WorkBuddy 网关 · 新版面板稿</title>
+<style>
+:root{
+  --bg:#f4f3f0; --panel:rgba(255,255,255,.72); --panel2:rgba(255,255,255,.55);
+  --line:rgba(0,0,0,.07); --line2:rgba(0,0,0,.045);
+  --fg:#1d1d1f; --sub:#86868b; --sub2:#aeaeb2;
+  --blue:#0071e3; --green:#34c759; --orange:#ff9500; --red:#ff3b30; --purple:#af52de;
+  --r:16px; --r2:11px;
+  --mono:ui-monospace,SFMono-Regular,"Cascadia Mono",Consolas,monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
+  background:var(--bg);color:var(--fg);
+  font:15px/1.62 -apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+  -webkit-font-smoothing:antialiased;
+  background-image:
+    radial-gradient(1000px 460px at 8% -10%, rgba(0,113,227,.07), transparent 62%),
+    radial-gradient(820px 400px at 96% 2%, rgba(175,82,222,.05), transparent 60%),
+    radial-gradient(700px 380px at 50% 108%, rgba(52,199,89,.05), transparent 62%);
+  display:flex;overflow:hidden;
+}
+::-webkit-scrollbar{width:9px;height:9px}
+::-webkit-scrollbar-thumb{background:rgba(0,0,0,.14);border-radius:9px;border:2px solid transparent;background-clip:padding-box}
+::-webkit-scrollbar-track{background:transparent}
+
+/* ---------- 左侧导航 ---------- */
+.rail{width:218px;flex:0 0 218px;padding:18px 12px;display:flex;flex-direction:column;gap:2px;
+  border-right:1px solid var(--line);background:rgba(255,255,255,.42);
+  backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);overflow:auto}
+.brand{display:flex;align-items:center;gap:9px;padding:4px 8px 16px}
+.logo{width:26px;height:26px;border-radius:8px;background:linear-gradient(150deg,#3a9bff,#0060df);
+  display:grid;place-items:center;color:#fff;font-size:12px;font-weight:700;box-shadow:0 2px 8px rgba(0,113,227,.3)}
+.brand b{font-size:14.5px;font-weight:650}
+.brand span{display:block;font-size:11.5px;color:var(--sub);font-weight:400}
+.grp{font-size:11.5px;color:var(--sub2);padding:14px 9px 5px;letter-spacing:.4px}
+.nav{display:flex;align-items:center;gap:9px;padding:7px 9px;border-radius:9px;cursor:pointer;
+  color:#4b4b4f;font-size:13.5px;border:1px solid transparent;user-select:none}
+.nav:hover{background:rgba(0,0,0,.04)}
+.nav.on{background:#fff;border-color:var(--line);color:var(--fg);font-weight:600;
+  box-shadow:0 1px 2px rgba(0,0,0,.04)}
+.nav svg{width:15px;height:15px;flex:0 0 15px;opacity:.72}
+.nav.on svg{opacity:1;color:var(--blue)}
+.rail .sp{flex:1}
+.acc{display:flex;align-items:center;gap:8px;padding:9px;border-radius:11px;background:rgba(255,255,255,.6);
+  border:1px solid var(--line)}
+.av{width:26px;height:26px;border-radius:50%;background:linear-gradient(150deg,#ffd08a,#ff9f5a);
+  display:grid;place-items:center;font-size:11px;font-weight:650;color:#7a4a10}
+.acc b{font-size:12.5px;font-weight:600;display:block}
+.acc span{font-size:11px;color:var(--sub)}
+
+/* ---------- 主区 ---------- */
+.main{flex:1;overflow:auto;padding:28px 32px 60px}
+.top{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:20px;gap:16px}
+.top h1{font-size:23px;font-weight:660;letter-spacing:-.3px}
+.top p{color:var(--sub);font-size:13.5px;margin-top:3px}
+.tools{display:flex;gap:8px;align-items:center}
+.pill{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;padding:4px 10px;border-radius:999px;
+  border:1px solid var(--line);background:rgba(255,255,255,.65);color:var(--sub)}
+.pill.ok{color:var(--green);border-color:rgba(52,199,89,.25);background:rgba(52,199,89,.08)}
+.pill b{color:var(--fg);font-weight:600}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 0 3px rgba(52,199,89,.16)}
+
+.btn{font:inherit;font-size:13px;padding:6px 13px;border-radius:9px;cursor:pointer;border:1px solid var(--line);
+  background:rgba(255,255,255,.8);color:var(--fg);font-weight:500;white-space:nowrap}
+.btn:hover{border-color:rgba(0,0,0,.2)}
+.btn.p{background:var(--blue);border-color:var(--blue);color:#fff}
+.btn.p:hover{background:#0077ed}
+.btn.s{padding:5px 10px;font-size:12.5px}
+.btn.dgr{color:var(--red);border-color:rgba(255,59,48,.28)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+
+.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);font-size:13.5px;
+  backdrop-filter:blur(20px) saturate(1.35);-webkit-backdrop-filter:blur(20px) saturate(1.35);
+  box-shadow:0 1px 2px rgba(0,0,0,.03),0 10px 28px rgba(0,0,0,.045);padding:18px 20px}
+.ct{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;gap:10px}
+.ct h3{font-size:14px;font-weight:640;letter-spacing:-.1px}
+.ct .hint{font-size:12.5px;color:var(--sub)}
+.g{display:grid;gap:14px}
+.g3{grid-template-columns:repeat(3,1fr)}
+.g2{grid-template-columns:repeat(2,1fr)}
+.g42{grid-template-columns:1.45fr 1fr}
+.g24{grid-template-columns:1fr 1.6fr}
+.mt{margin-top:14px}
+
+.kv{display:flex;justify-content:space-between;font-size:13px;padding:5px 0}
+.kv span{color:var(--sub)}
+.kv b{font-weight:600;font-variant-numeric:tabular-nums}
+.kv+.kv{border-top:1px solid var(--line2)}
+
+.num{font-variant-numeric:tabular-nums}
+.big{font-size:34px;font-weight:680;letter-spacing:-.8px;line-height:1.06;font-variant-numeric:tabular-nums}
+.big small{font-size:14px;font-weight:500;color:var(--sub);letter-spacing:0;margin-left:3px}
+.lbl{font-size:12.5px;color:var(--sub);margin-bottom:8px}
+.mono{font-family:var(--mono);font-size:12.5px}
+
+table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
+th{text-align:left;font-size:12px;font-weight:500;color:var(--sub);padding:0 9px 8px;
+  border-bottom:1px solid var(--line);white-space:nowrap}
+td{padding:9px 9px;border-bottom:1px solid var(--line2);font-size:13.5px;white-space:nowrap}
+tbody tr:last-child td{border-bottom:none}
+tbody tr:hover td{background:rgba(0,0,0,.018)}
+.n{text-align:right}
+.free{color:var(--green);font-weight:600}
+.warn{color:var(--orange)}
+.bad{color:var(--red)}
+
+.bar{height:6px;border-radius:99px;background:rgba(0,0,0,.06);overflow:hidden}
+.bar i{display:block;height:100%;background:linear-gradient(90deg,#34c759,#0071e3);border-radius:99px}
+
+.seg{display:inline-flex;background:rgba(0,0,0,.05);border-radius:9px;padding:2px;gap:2px}
+.seg button{font:inherit;font-size:12.5px;padding:4px 11px;border:0;border-radius:7px;background:transparent;
+  color:var(--sub);cursor:pointer}
+.seg button.on{background:#fff;color:var(--fg);font-weight:600;box-shadow:0 1px 3px rgba(0,0,0,.09)}
+
+.tags{display:flex;gap:5px;flex-wrap:wrap}
+.tg{font-size:11.5px;padding:2px 8px;border-radius:6px;background:rgba(0,0,0,.045);color:var(--sub)}
+.tg.b{background:rgba(0,113,227,.09);color:var(--blue)}
+.tg.g{background:rgba(52,199,89,.1);color:#248a3d}
+.tg.o{background:rgba(255,149,0,.11);color:#b25000}
+
+.row{display:flex;align-items:center;gap:10px}
+.row.b{justify-content:space-between}
+.mt8{margin-top:8px}.mt12{margin-top:12px}.mt16{margin-top:16px}
+.fs11{font-size:12.5px}.fs12{font-size:13px}
+.sub{color:var(--sub)}
+.empty{padding:22px;text-align:center;color:var(--sub2);font-size:13px}
+
+/* 账号卡 */
+.acct{display:flex;gap:12px;align-items:flex-start}
+.acct .av{width:36px;height:36px;border-radius:11px;font-size:14px;flex:0 0 36px}
+.acct h4{font-size:14px;font-weight:640}
+.acct .m{font-size:12.5px;color:var(--sub);margin-top:1px}
+.acct.off{opacity:.55}
+
+/* 图表 */
+.chart{display:flex;align-items:flex-end;gap:3px;height:120px;padding-top:6px}
+.chart i{flex:1;background:linear-gradient(180deg,rgba(0,113,227,.85),rgba(0,113,227,.35));
+  border-radius:3px 3px 0 0;min-height:2px}
+.chart i.g{background:linear-gradient(180deg,rgba(52,199,89,.8),rgba(52,199,89,.28))}
+.xax{display:flex;gap:3px;margin-top:6px}
+.xax span{flex:1;text-align:center;font-size:10.5px;color:var(--sub2)}
+
+/* 日志 */
+.log{font-family:var(--mono);font-size:12.5px;line-height:1.85;max-height:340px;overflow:auto}
+.log div{display:flex;gap:9px;padding:1px 0}
+.log t{color:var(--sub2);flex:0 0 58px}
+.log b{flex:0 0 44px;font-weight:600}
+.log .i b{color:var(--blue)} .log .w b{color:var(--orange)} .log .e b{color:var(--red)}
+.log p{color:#3a3a3c;white-space:pre-wrap;word-break:break-all}
+
+/* 任务 */
+.task{display:flex;align-items:center;gap:11px;padding:11px 12px;border:1px solid var(--line);
+  border-radius:var(--r2);background:rgba(255,255,255,.5)}
+.task .ic{width:30px;height:30px;border-radius:9px;display:grid;place-items:center;flex:0 0 30px;
+  background:rgba(0,113,227,.09);color:var(--blue)}
+.task .ic.g{background:rgba(52,199,89,.1);color:#248a3d}
+.task .ic.o{background:rgba(255,149,0,.1);color:#b25000}
+.task h4{font-size:13.5px;font-weight:600}
+.task p{font-size:12px;color:var(--sub)}
+.task .sp{flex:1}
+.chk{width:17px;height:17px;border-radius:50%;border:1.5px solid rgba(52,199,89,.5);
+  display:grid;place-items:center;color:#fff;font-size:10px;background:var(--green);flex:0 0 17px}
+.chk.no{background:transparent;border-color:rgba(0,0,0,.16)}
+
+/* 智能体 */
+.cli{display:flex;align-items:center;gap:12px;padding:13px;border:1px solid var(--line);
+  border-radius:var(--r2);background:rgba(255,255,255,.55)}
+.cli .ic{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;flex:0 0 34px;
+  font-size:12px;font-weight:700;color:#fff;background:#333}
+.cli h4{font-size:14px;font-weight:640}
+.cli p{font-size:12.5px;color:var(--sub)}
+.cli .sp{flex:1}
+
+/* 设置 */
+.set{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:11px 0}
+.set+.set{border-top:1px solid var(--line2)}
+.set h4{font-size:13.5px;font-weight:600}
+.set p{font-size:12px;color:var(--sub);margin-top:1px}
+.sw{width:38px;height:22px;border-radius:99px;background:rgba(0,0,0,.14);position:relative;
+  cursor:pointer;flex:0 0 38px;transition:background .18s}
+.sw::after{content:"";position:absolute;width:18px;height:18px;border-radius:50%;background:#fff;
+  top:2px;left:2px;box-shadow:0 1px 3px rgba(0,0,0,.2);transition:left .18s}
+.sw.on{background:var(--green)}
+.sw.on::after{left:18px}
+.inp{font:inherit;font-size:13px;padding:6px 10px;border-radius:8px;border:1px solid var(--line);
+  background:rgba(255,255,255,.8);width:210px;color:var(--fg)}
+
+.note{padding:11px 13px;border-radius:var(--r2);font-size:11.5px;color:var(--sub);
+  background:rgba(0,113,227,.05);border:1px solid rgba(0,113,227,.11);line-height:1.65;font-size:12.5px}
+.note b{color:var(--fg)}
+.warnbox{background:rgba(255,149,0,.06);border-color:rgba(255,149,0,.18)}
+
+.page{display:none}.page.on{display:block}
+</style>
+</head>
+<body>
+
+<!-- ================= 左侧导航 ================= -->
+<aside class="rail">
+  <div class="brand">
+    <div class="logo">W</div>
+    <div><b>WorkBuddy 网关</b><span>本机 · 127.0.0.1:8788</span></div>
+  </div>
+
+  <div class="grp">基本功能</div>
+  <div class="nav on" data-p="gw"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 12h4l3-8 4 16 3-8h4"/></svg>网关与账号</div>
+  <div class="nav" data-p="task"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 6L9 17l-5-5"/></svg>任务与福利</div>
+  <div class="nav" data-p="dash"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>数据看板</div>
+  <div class="nav" data-p="agent"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="14" rx="2"/><path d="M8 21h8M9 9l3 3-3 3"/></svg>智能体配置</div>
+  <div class="nav" data-p="log"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 4h16v16H4z"/><path d="M8 9h8M8 13h8M8 17h5"/></svg>运行日志</div>
+  <div class="nav" data-p="set"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M19 5l-2 2M7 17l-2 2"/></svg>设置</div>
+
+  <div class="grp">其他</div>
+  <div class="nav" data-p="mcp"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M6 10v4M10 10v4M14 10v4M18 10v4"/></svg>MCP</div>
+  <div class="nav" data-p="skill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2l2.5 6.5L21 11l-6.5 2.5L12 20l-2.5-6.5L3 11l6.5-2.5z"/></svg>Skills</div>
+  <div class="nav" data-p="prompt"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 4h16v12H8l-4 4z"/></svg>提示词</div>
+  <div class="nav" data-p="conv"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 12a8 8 0 11-3-6.2"/><path d="M21 3v5h-5"/></svg>会话</div>
+  <div class="nav" data-p="auth"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2l8 4v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6z"/></svg>授权中心</div>
+  <div class="nav" data-p="usage"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 3v18h18"/><path d="M7 15l4-6 4 4 4-7"/></svg>用量统计</div>
+
+  <div class="sp"></div>
+  <div class="acc">
+    <div class="av">羊</div>
+    <div><b>六只羊🐑</b><span>国内版 · 余额 2525.81</span></div>
+  </div>
+</aside>
+
+<!-- ================= 主区 ================= -->
+<main class="main">
+
+  <!-- ============ 网关与账号 ============ -->
+  <section class="page on" id="p-gw">
+    <div class="top">
+      <div><h1>网关与账号</h1><p>管理账号凭证与代理出口，查看当日用量、请求流水、成签到与活跃记录</p></div>
+      <div class="tools">
+        <span class="pill ok"><span class="dot"></span>网关运行中</span>
+        <span class="pill">监听 <b>127.0.0.1:8788</b></span>
+        <button class="btn">+ 添加账号</button>
+      </div>
+    </div>
+
+    <div class="g g2">
+      <div class="card">
+        <div class="ct"><h3>账号列表</h3><span class="hint">国内版 1 个 · 国际版 0 个</span></div>
+        <div class="acct">
+          <div class="av">羊</div>
+          <div style="flex:1">
+            <div class="row b">
+              <h4>六只羊🐑 <span class="tg g">国内版</span> <span class="tg b">CLI</span></h4>
+              <div class="row">
+                <button class="btn s">停用</button><button class="btn s">编辑</button><button class="btn s">导出</button>
+              </div>
+            </div>
+            <div class="m">copilot.tencent.com · 30 天后到期 · 已接入桌面端凭证</div>
+            <div class="g g3 mt12">
+              <div><div class="lbl">剩余积分</div><div class="big">2525<small>.81</small></div></div>
+              <div><div class="lbl">今日消耗</div><div class="big">14<small>.95</small></div></div>
+              <div><div class="lbl">今日请求</div><div class="big">58<small>次</small></div></div>
+            </div>
+            <div class="bar mt12"><i style="width:24%"></i></div>
+            <div class="kv mt8"><span>总额 / 已用</span><b>3326 / 800.19（24.1%）</b></div>
+            <div class="kv"><span>签到</span><b>今日已签 · 连续 17 天 · 日 +100</b></div>
+          </div>
+        </div>
+        <div class="acct off mt16">
+          <div class="av" style="background:rgba(0,0,0,.07);color:var(--sub)">G</div>
+          <div style="flex:1">
+            <h4>国际版（www.workbuddy.ai）</h4>
+            <div class="m">当前未接入账号。仅国内版在使用，此卡片可折叠隐藏。</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="ct"><h3>网关状态</h3><span class="hint">catalog: remote</span></div>
+        <div class="kv"><span>监听地址</span><b>http://127.0.0.1:8788/v1</b></div>
+        <div class="kv"><span>API Key 鉴权</span><b class="free">关闭（仅本机）</b></div>
+        <div class="kv"><span>上游区域</span><div class="row"><b>国内版 cn</b><button class="btn s">切换</button></div></div>
+        <div class="kv"><span>上游地址</span><b>www.workbuddy.cn</b></div>
+        <div class="kv"><span>User-Agent</span><b class="mono">WorkBuddy/5.8.4 CLI/2.161.0</b></div>
+        <div class="kv"><span>模型目录</span><b>16 个 · 来自上游 API</b></div>
+        <div class="kv"><span>本地网络工具</span><b class="free">已开启</b></div>
+        <div class="ct mt16"><h3>当前禁用 / 冷却</h3></div>
+        <div class="empty">无。账号与模型均在正常服务状态。</div>
+      </div>
+    </div>
+
+    <div class="g g42 mt">
+      <div class="card">
+        <div class="ct"><h3>最近请求</h3>
+          <div class="row"><span class="hint">共 67 条</span><button class="btn s">导出</button></div></div>
+        <table>
+          <thead><tr><th>时间</th><th>模型</th><th class="n">输入</th><th class="n">输出</th>
+            <th class="n">tokens</th><th class="n">积分</th><th class="n">缓存</th></tr></thead>
+          <tbody>
+            <tr><td class="mono">17:31:58</td><td>deepseek-v4.1-flash</td><td class="n">242,262</td><td class="n">1,263</td><td class="n">243,525</td><td class="n">0.14</td><td class="n">99.9%</td></tr>
+            <tr><td class="mono">17:31:49</td><td>deepseek-v4.1-flash</td><td class="n">241,788</td><td class="n">459</td><td class="n">242,247</td><td class="n">0.10</td><td class="n">99.7%</td></tr>
+            <tr><td class="mono">17:22:36</td><td>deepseek-v4.1-flash</td><td class="n">146,649</td><td class="n">1,026</td><td class="n">147,675</td><td class="n">0.10</td><td class="n">99.9%</td></tr>
+            <tr><td class="mono">17:22:28</td><td>deepseek-v4.1-flash</td><td class="n">145,392</td><td class="n">1,189</td><td class="n">146,581</td><td class="n">0.15</td><td class="n">98.2%</td></tr>
+            <tr><td class="mono">17:22:20</td><td>deepseek-v4.1-flash</td><td class="n">141,900</td><td class="n">831</td><td class="n">142,731</td><td class="n">0.09</td><td class="n">99.9%</td></tr>
+            <tr><td class="mono">16:50:44</td><td>deepseek-v4.1-flash</td><td class="n">238,595</td><td class="n">8,755</td><td class="n">247,350</td><td class="n bad">3.91</td><td class="n">0%</td></tr>
+            <tr><td class="mono">16:50:12</td><td>deepseek-v4.1-flash</td><td class="n">122,586</td><td class="n">635</td><td class="n">123,221</td><td class="n bad">1.79</td><td class="n">0%</td></tr>
+          </tbody>
+        </table>
+        <div class="note mt12">积分由上游返回，四舍五入到 <b>0.01</b>；单条小请求会显示 0。<b>缓存命中率</b>决定实际单价——同尺寸请求命中 99% 时只要 0.10，未命中要 1.79。</div>
+      </div>
+
+      <div class="card">
+        <div class="ct"><h3>最近模型清单</h3><button class="btn s">刷新模型</button></div>
+        <div class="scroll" style="max-height:236px;overflow:auto;margin:0 -6px;padding:0 6px">
+          <table>
+            <thead><tr><th>模型</th><th class="n">倍率</th><th class="n">上下文</th></tr></thead>
+            <tbody>
+              <tr><td>hy4-preview</td><td class="n">x0.29</td><td class="n">960,000</td></tr>
+              <tr><td>hy3</td><td class="n free">x0.00</td><td class="n">192,000</td></tr>
+              <tr><td>deepseek-v4.1-flash</td><td class="n">x0.11</td><td class="n">1,000,000</td></tr>
+              <tr><td>glm-5.3</td><td class="n">x0.79</td><td class="n">1,000,000</td></tr>
+              <tr><td>glm-5.3-flash</td><td class="n">x0.06</td><td class="n">1,000,000</td></tr>
+              <tr><td>glm-5.2</td><td class="n">x0.79</td><td class="n">1,000,000</td></tr>
+              <tr><td>glm-5.1</td><td class="n">x0.79</td><td class="n">200,000</td></tr>
+              <tr><td>glm-5v-turbo</td><td class="n">x0.71</td><td class="n">200,000</td></tr>
+              <tr><td>minimax-m3</td><td class="n">x0.25</td><td class="n">512,000</td></tr>
+              <tr><td>kimi-k3-1</td><td class="n">x1.62</td><td class="n">1,000,000</td></tr>
+              <tr><td>kimi-k2.8-preview</td><td class="n">x0.77</td><td class="n">1,000,000</td></tr>
+              <tr><td>kimi-k2.7</td><td class="n">x0.57</td><td class="n">256,000</td></tr>
+              <tr><td>kimi-k2.6</td><td class="n">x0.52</td><td class="n">256,000</td></tr>
+              <tr><td>deepseek-v4-pro</td><td class="n">x0.51</td><td class="n">1,000,000</td></tr>
+              <tr><td>step-5-preview</td><td class="n free">x0.00</td><td class="n">1,000,000</td></tr>
+              <tr><td>space-bunny</td><td class="n">x0.08</td><td class="n">1,000,000</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="ct mt16"><h3>签到与活跃记录</h3><span class="hint">最近 5 次真实尝试</span></div>
+        <table>
+          <thead><tr><th>时间</th><th>任务</th><th>结果</th></tr></thead>
+          <tbody>
+            <tr><td class="mono">今日 00:12</td><td>每日签到</td><td class="free">成功 +100</td></tr>
+            <tr><td class="mono">今日 08:40</td><td>每日活跃</td><td class="free">成功 +30</td></tr>
+            <tr><td class="mono">昨日 00:09</td><td>每日签到</td><td class="free">成功 +100</td></tr>
+            <tr><td class="mono">昨日 09:15</td><td>每日活跃</td><td class="free">成功 +30</td></tr>
+            <tr><td class="mono">前日 00:07</td><td>每日签到</td><td class="free">成功 +100</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 任务与福利 ============ -->
+  <section class="page" id="p-task">
+    <div class="top">
+      <div><h1>任务与福利</h1><p>国内版成长任务、连续打卡与猫猫日常，一键点亮领奖</p></div>
+      <div class="tools">
+        <span class="pill ok">今日已签到 · 连续 <b>17</b> 天</span>
+        <button class="btn p">一键全部领取</button>
+      </div>
+    </div>
+
+    <div class="g g3">
+      <div class="card"><div class="lbl">今日新增积分</div><div class="big">+130</div>
+        <div class="kv mt8"><span>签到</span><b>+100</b></div><div class="kv"><span>每日活跃</span><b>+30</b></div></div>
+      <div class="card"><div class="lbl">连续签到</div><div class="big">17<small>天</small></div>
+        <div class="kv mt8"><span>下次奖励</span><b>第 7 天翻倍 +200</b></div><div class="kv"><span>中断重置</span><b>断签从第 1 天重新计</b></div></div>
+      <div class="card"><div class="lbl">最近到期积分包</div><div class="big">17<small>天后</small></div>
+        <div class="kv mt8"><span>CodeBuddy个人版裂变包</span><b>97.89</b></div><div class="kv"><span>到期日</span><b>2026-11-04</b></div></div>
+    </div>
+
+<div class="card mt">
+      <div class="ct"><h3>后台调度器</h3>
+        <div class="row">
+          <span class="pill ok"><span class="dot"></span>已启用 · 随网关运行</span>
+          <span class="hint">下次执行 <b>今日 21:00</b></span>
+          <button class="btn s">暂停调度</button>
+          <button class="btn s p">立即执行一次</button>
+        </div></div>
+      <div class="g g2">
+        <div>
+          <table>
+            <thead><tr><th>定时任务</th><th>执行时间</th><th>作用</th></tr></thead>
+            <tbody>
+              <tr><td>每日签到</td><td class="mono">09:00 / 21:00</td><td>所有国内版账号自动签到领积分</td></tr>
+              <tr><td>对话活跃上报</td><td class="mono">每日定时</td><td>上报轻量会话事件，点亮连登与热力墙</td></tr>
+              <tr><td>猫猫旅行</td><td class="mono">09:00 派 / 21:00 领</td><td>自动派出旅行并结算归来奖励</td></tr>
+              <tr><td>Token 保活</td><td class="mono">22:00</td><td>剩余寿命不足 2 小时自动刷新</td></tr>
+              <tr><td>夜猫子任务</td><td class="mono">01:00</td><td>夜猫专属日常与抽奖兑换</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div>
+          <div class="kv"><span>上次执行</span><b>今日 09:00 · 签到成功 +100</b></div>
+          <div class="kv"><span>Token 剩余寿命</span><b class="free">29 天，暂不需刷新</b></div>
+          <div class="kv"><span>执行记录</span><b>保留最近 60 条，同步进运行日志</b></div>
+          <div class="kv"><span>时间基准</span><b>CST 24 小时制</b></div>
+          <div class="note mt12">调度器是<b>网关进程内的后台线程</b>：网关开着才跑，关掉窗口等于暂停。所有动作都会写进运行日志，标签为「调度器 / 任务」。</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="g g2 mt">
+      <div class="card">
+        <div class="ct"><h3>成长任务</h3><button class="btn s">刷新状态</button></div>
+        <div class="row mt8"><div class="task" style="flex:1"><div class="ic">签</div>
+          <div><h4>每日签到</h4><p>每天一次，连签有额外奖励</p></div>
+          <div class="sp"></div><div class="chk">✓</div></div></div>
+        <div class="row mt8"><div class="task" style="flex:1"><div class="ic g">聊</div>
+          <div><h4>每日活跃对话</h4><p>与任意模型完成一轮对话</p></div>
+          <div class="sp"></div><div class="chk">✓</div></div></div>
+        <div class="row mt8"><div class="task" style="flex:1"><div class="ic o">探</div>
+          <div><h4>探索新模型</h4><p>使用一个本周没用过的模型</p></div>
+          <div class="sp"></div><div class="chk no"></div></div></div>
+        <div class="row mt8"><div class="task" style="flex:1"><div class="ic">享</div>
+          <div><h4>分享邀请</h4><p>邀请好友注册并激活</p></div>
+          <div class="sp"></div><div class="chk no"></div></div></div>
+      </div>
+
+      <div class="card">
+        <div class="ct"><h3>猫猫日常</h3><div class="row"><button class="btn s">派出旅行</button><button class="btn s">领奖</button></div></div>
+        <div class="kv"><span>当前状态</span><b>旅行中 · 剩余 2 小时 14 分</b></div>
+        <div class="kv"><span>已带回纪念品</span><b>3 件（积分 +50）</b></div>
+        <div class="kv"><span>今日次数</span><b>1 / 3</b></div>
+        <div class="ct mt16"><h3>领取记录</h3></div>
+        <table>
+          <thead><tr><th>时间</th><th>来源</th><th class="n">积分</th></tr></thead>
+          <tbody>
+            <tr><td class="mono">今日 00:12</td><td>每日签到</td><td class="n">+100</td></tr>
+            <tr><td class="mono">今日 08:40</td><td>每日活跃</td><td class="n">+30</td></tr>
+            <tr><td class="mono">昨日 00:09</td><td>每日签到</td><td class="n">+100</td></tr>
+            <tr><td class="mono">昨日 21:03</td><td>猫猫纪念品</td><td class="n">+50</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="card mt">
+      <div class="ct"><h3>积分获取历史</h3><span class="hint">只读内存快照，不发上游请求</span></div>
+      <table>
+        <thead><tr><th>积分包</th><th>发放时间</th><th class="n">面额</th><th class="n">剩余</th><th>到期</th><th>状态</th></tr></thead>
+        <tbody>
+          <tr><td>CodeBuddy个人版裂变包</td><td class="mono">2026-10-11</td><td class="n">300</td><td class="n">97.89</td><td class="mono">2026-11-04</td><td class="free">使用中</td></tr>
+          <tr><td>每日签到奖励</td><td class="mono">今日 00:12</td><td class="n">100</td><td class="n">100</td><td class="mono">长期</td><td class="free">可用</td></tr>
+          <tr><td>连签第 7 天奖励</td><td class="mono">2026-10-15</td><td class="n">1000</td><td class="n">0</td><td class="mono">已用完</td><td class="sub">已耗尽</td></tr>
+        </tbody>
+      </table>
+      <div class="note mt12">「快过期先用」由调度器自动处理：<b>17.7 天后到期的那 97.89 分会优先被消耗</b>，不会浪费。</div>
+    </div>
+  </section>
+
+  <!-- ============ 数据看板 ============ -->  </section>
+
+  <!-- ============ 数据看板 ============ -->
+  <section class="page" id="p-dash">
+    <div class="top">
+      <div><h1>数据看板</h1><p>按时间口径查看 KPI、账号用量透视与模型性能</p></div>
+      <div class="tools">
+        <div class="seg" id="seg">
+          <button class="on">今日</button><button>本周</button><button>本月</button>
+          <button>全部</button><button>自定义</button>
+        </div>
+        <button class="btn s">刷新</button>
+      </div>
+    </div>
+
+    <div class="g g3">
+      <div class="card"><div class="lbl">请求数</div><div class="big">67</div><div class="kv mt8"><span>成功</span><b class="free">67（100%）</b></div></div>
+      <div class="card"><div class="lbl">tokens</div><div class="big">6.99<small>M</small></div><div class="kv mt8"><span>缓存命中</span><b>96.4%</b></div></div>
+      <div class="card"><div class="lbl">消耗积分</div><div class="big">14.95</div><div class="kv mt8"><span>折合参考</span><b>¥ 0.58</b></div></div>
+      <div class="card"><div class="lbl">平均耗时</div><div class="big">8.4<small>秒</small></div><div class="kv mt8"><span>生成速度</span><b>191 t/s</b></div></div>
+    </div>
+
+<div class="card mt">
+      <div class="ct"><h3>定价与取价状态</h3><button class="btn s">立即取价</button></div>
+      <div class="g g3">
+        <div><div class="lbl">当前策略</div><div class="mono">632d48edd5ae</div></div>
+        <div><div class="lbl">上次取价</div><div><b>16:40</b> · 42 个模型</div></div>
+        <div><div class="lbl">下次取价</div><div><b>21:40</b> · 每 5 小时</div></div>
+      </div>
+      <div class="kv mt8"><span>未定价模型</span><b class="free">0 个</b></div>
+      <div class="kv"><span>来源</span><b>OpenRouter 公价折算人民币，仅作参考；真实扣费看积分</b></div>
+      <div class="kv"><span>手动映射</span><b>可填「hub 模型 → OpenRouter id」运行期覆盖</b></div>
+    </div>
+
+    <div class="g g2 mt">
+      <div class="card">
+        <div class="ct"><h3>tokens 与积分（按小时）</h3><span class="hint">蓝=tokens　绿=积分</span></div>
+        <div class="chart">
+          <i style="height:18%"></i><i style="height:12%"></i><i style="height:9%"></i><i style="height:7%"></i>
+          <i style="height:6%"></i><i style="height:8%"></i><i style="height:11%"></i><i style="height:9%"></i>
+          <i style="height:100%" class="g" style2="" ></i><i style="height:74%"></i><i style="height:52%"></i><i style="height:31%"></i>
+          <i style="height:24%"></i><i style="height:19%"></i><i style="height:14%"></i><i style="height:10%"></i>
+        </div>
+        <div class="xax"><span>0</span><span>2</span><span>4</span><span>6</span><span>8</span><span>10</span><span>12</span><span>14</span><span>16</span><span>18</span><span>20</span><span>22</span></div>
+        <div class="note mt12">16 点那一根是全天的 <b>88%</b>：冷启动未命中缓存，单次 1.79~3.91 积分；之后命中率 98% 以上，单价掉到 0.10。</div>
+      </div>
+
+      <div class="card">
+        <div class="ct"><h3>账号用量透视</h3></div>
+        <table>
+          <thead><tr><th>账号</th><th class="n">请求</th><th class="n">tokens</th><th class="n">积分</th><th class="n">占比</th></tr></thead>
+          <tbody>
+            <tr><td>六只羊🐑</td><td class="n">67</td><td class="n">6.99M</td><td class="n">14.95</td><td class="n">100%</td></tr>
+            <tr><td>国际版账号</td><td class="n sub">—</td><td class="n sub">—</td><td class="n sub">—</td><td class="n sub">—</td></tr>
+          </tbody>
+        </table>
+        <div class="ct mt16"><h3>模型性能</h3></div>
+        <table>
+          <thead><tr><th>模型</th><th class="n">请求</th><th class="n">tokens</th><th class="n">速度</th><th class="n">积分</th></tr></thead>
+          <tbody>
+            <tr><td>deepseek-v4.1-flash</td><td class="n">67</td><td class="n">6.99M</td><td class="n">191 t/s</td><td class="n">14.95</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 智能体配置 ============ -->
+  <section class="page" id="p-agent">
+    <div class="top">
+      <div><h1>智能体配置</h1><p>检测本机已装的 AI 客户端，一键把配置指向本网关；改前自动备份，随时字节级还原</p></div>
+    </div>
+
+    <div class="g g2">
+      <div class="cli">
+        <div class="ic" style="background:#10a37f">CX</div>
+        <div style="flex:1"><h4>Codex CLI / 桌面版</h4>
+          <p>已配置 · base_url <span class="mono">http://127.0.0.1:8788/v1</span> · wire_api <span class="mono">responses</span></p></div>
+        <span class="tg g">使用中</span>
+        <div class="sp"></div>
+        <button class="btn s">一键还原</button>
+      </div>
+      <div class="cli">
+        <div class="ic" style="background:#d97757">CC</div>
+        <div style="flex:1"><h4>Claude Code</h4>
+          <p>未配置 · 将指向 <span class="mono">ANTHROPIC_BASE_URL</span></p></div>
+        <span class="tg">未接入</span>
+        <div class="sp"></div>
+        <button class="btn s p">一键配置</button>
+      </div>
+      <div class="cli">
+        <div class="ic" style="background:#5b6cff">DS</div>
+        <div style="flex:1"><h4>DeepSeek Harness</h4>
+          <p>未配置 · 将写入 <span class="mono">~/.dsh/settings.yaml</span></p></div>
+        <span class="tg">未接入</span>
+        <div class="sp"></div>
+        <button class="btn s">一键配置</button>
+      </div>
+      <div class="cli">
+        <div class="ic" style="background:#8e8e93">ZC</div>
+        <div style="flex:1"><h4>ZCode / Crush / OpenCode</h4>
+          <p>未检测到安装</p></div>
+        <span class="tg">未安装</span>
+        <div class="sp"></div>
+        <button class="btn s" disabled>一键配置</button>
+      </div>
+    </div>
+
+    <div class="card mt">
+      <div class="ct"><h3>配置说明</h3></div>
+      <div class="note">写入前自动备份到 <span class="mono">accounts/agent-backups/&lt;客户端&gt;/</span>，每文件保留最新 10 份，<b>首次接入的原件永久保留</b>；多文件客户端两阶段写入，任一失败立即回退。还原是字节级写回原件，不是「猜着改回去」。</div>
+      <div class="note warnbox mt12"><b>注意</b>：面板的一键配置只在<b>网关本机</b>且用 <span class="mono">127.0.0.1</span> 打开时可用。客户端装在别的机器上时，改用配置器 CLI：<span class="mono">python wb_agents.py apply --client codex --base-url http://网关IP:8788/v1 --key sk-...</span></div>
+    </div>
+  </section>
+
+  <!-- ============ 运行日志 ============ -->
+  <section class="page" id="p-log">
+    <div class="top">
+      <div><h1>运行日志</h1><p>请求链路、上游调用与后台调度，最新在前</p></div>
+      <div class="tools">
+        <div class="seg"><button class="on">全部</button><button>仅警告</button><button>仅错误</button></div>
+        <button class="btn s">清空</button><button class="btn s">导出</button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="log">
+        <div><t>17:31:58</t><b class="i">INFO</b><p>chat done: model=deepseek-v4.1-flash acct=0d184d35 3870ms tokens=131787 (in=131604 out=183) 120.39t/s</p></div>
+        <div><t>17:31:49</t><b class="i">INFO</b><p>responses: model=deepseek-v4.1-flash stream=True msgs=158 effort='high' tools=141/18</p></div>
+        <div><t>17:22:36</t><b class="i">INFO</b><p>chat done: model=deepseek-v4.1-flash acct=0d184d35 42314ms tokens=247350 (in=238595 out=8755) 234.82t/s</p></div>
+        <div><t>17:22:28</t><b class="w">WARN</b><p>webtools: search cache hit for '北京时间 现在几点 在线时钟'</p></div>
+        <div><t>17:22:14</t><b class="i">INFO</b><p>web tool web_search -&gt; 1083 chars, 5 citeable source(s)</p></div>
+        <div><t>17:22:05</t><b class="i">INFO</b><p>webtools: search 'current time in Beijing China now' served by bing (376 ms, 5 results)</p></div>
+        <div><t>16:50:45</t><b class="i">INFO</b><p>alias: background model gpt-5.6-terra -&gt; deepseek-v4.1-flash</p></div>
+        <div><t>16:50:44</t><b class="i">INFO</b><p>chat done: model=deepseek-v4.1-flash acct=0d184d35 42314ms tokens=247350 (in=238595 out=8755)</p></div>
+        <div><t>16:50:12</t><b class="i">INFO</b><p>responses: model=deepseek-v4.1-flash stream=False msgs=152 effort=None tools=141/18</p></div>
+        <div><t>16:40:39</t><b class="i">INFO</b><p>catalog refresh: cn updated from the product-config endpoint (16 models)</p></div>
+        <div><t>16:23:50</t><b class="i">INFO</b><p>listening : http://127.0.0.1:8788/v1  (api key: off)</p></div>
+        <div><t>16:23:50</t><b class="w">WARN</b><p>panel : password is still the default 'admin' - change it in the panel</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 设置 ============ -->
+  <section class="page" id="p-set">
+    <div class="top"><div><h1>设置</h1><p>面板密码、API Key、计价与本地工具</p></div></div>
+    <div class="g g2">
+      <div class="card">
+        <div class="ct"><h3>面板与密钥</h3></div>
+        <div class="set"><div><h4>面板密码</h4><p>当前仍是默认值，建议修改</p></div>
+          <div class="row"><input class="inp" type="password" value="admin" /><button class="btn s p">保存</button></div></div>
+        <div class="set"><div><h4>API Key</h4><p>网关当前未开启鉴权（仅监听本机）</p></div>
+          <div class="sw on"></div></div>
+        <div class="set"><div><h4>界面语言</h4><p>跟随面板设置</p></div>
+          <div class="seg"><button class="on">中文</button><button>EN</button></div></div>
+      </div>
+      <div class="card">
+        <div class="ct"><h3>计价与上游</h3></div>
+        <div class="set"><div><h4>价格估算</h4><p>按 OpenRouter 公价折算人民币，仅作参考</p></div><div class="sw on"></div></div>
+        <div class="set"><div><h4>本地网络工具</h4><p>接管 Codex 的 web_search 声明，本地代跑</p></div><div class="sw on"></div></div>
+        <div class="set"><div><h4>每日任务模型</h4><p>签到与日常对话使用的模型</p></div><input class="inp" value="deepseek-v4.1-flash" /></div>
+        <div class="set"><div><h4>后台模型改写</h4><p>把客户端后台任务指向免费模型，避免偷扣积分</p></div>
+          <div class="row"><input class="inp" value="hy3（免费）" /><button class="btn s">保存</button></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ MCP / Skills / 提示词 / 会话 / 授权 / 用量 ============ -->
+  <section class="page" id="p-mcp">
+    <div class="top"><div><h1>MCP</h1><p>面板内置的本地网络工具与会话管理服务</p></div>
+      <div class="tools"><span class="pill ok">本地工具已开启</span><button class="btn">+ 添加服务</button></div></div>
+    <div class="g g2">
+      <div class="card"><div class="ct"><h3>本地网络工具</h3><span class="hint">接管 web_search / web_fetch</span></div>
+        <div class="kv"><span>搜索引擎</span><b>DuckDuckGo → Bing → Wikipedia → Stack Overflow → Google News</b></div>
+        <div class="kv"><span>单次预算</span><b>25 秒（WB_WEB_BUDGET）</b></div>
+        <div class="kv"><span>最小间隔</span><b>0.5 秒 · 缓存 600 秒</b></div>
+        <div class="kv"><span>代跑轮数</span><b>最多 3 轮</b></div></div>
+      <div class="card"><div class="ct"><h3>已配置服务</h3></div>
+        <div class="empty">暂无外部 MCP 服务。网关自身不依赖外部 MCP，客户端（如 Codex）的 MCP 由客户端自己管理。</div></div>
+    </div>
+  </section>
+
+  <section class="page" id="p-skill">
+    <div class="top"><div><h1>Skills</h1><p>网关可下发给客户端的技能包</p></div></div>
+    <div class="g g3">
+      <div class="card"><div class="ct"><h3>文档处理</h3><span class="tg g">内置</span></div><p class="sub fs12">读 docx / pdf / xlsx，抽取正文与表格。</p></div>
+      <div class="card"><div class="ct"><h3>联网检索</h3><span class="tg g">内置</span></div><p class="sub fs12">多引擎轮换搜索与页面抓取，结果带引用。</p></div>
+      <div class="card"><div class="ct"><h3>代码执行</h3><span class="tg o">可选</span></div><p class="sub fs12">沙箱内运行代码并回传结果。</p></div>
+    </div>
+  </section>
+
+  <section class="page" id="p-prompt">
+    <div class="top"><div><h1>提示词</h1><p>注入到每次请求的系统提示与预设</p></div>
+      <div class="tools"><button class="btn">+ 新建预设</button></div></div>
+    <div class="card">
+      <div class="ct"><h3>默认系统提示</h3><span class="hint">上游要求必须有 system 消息</span></div>
+      <div class="mono" style="background:rgba(0,0,0,.03);padding:12px;border-radius:10px;line-height:1.8">You are a helpful assistant.</div>
+      <div class="note mt12">客户端没带 system 时用它兜底。Codex 自带很长的指令，通常用不到这里。</div>
+    </div>
+  </section>
+
+  <section class="page" id="p-conv">
+    <div class="top"><div><h1>会话</h1><p>按对话归集的用量（与右下角浮窗同源）</p></div></div>
+    <div class="card">
+      <div class="ct"><h3>最近对话</h3><button class="btn s">刷新</button></div>
+      <table>
+        <thead><tr><th>结束</th><th class="n">请求</th><th class="n">轮次</th><th class="n">tokens</th><th class="n">积分</th></tr></thead>
+        <tbody>
+          <tr><td class="mono">今天 17:31</td><td class="n">58</td><td class="n">5</td><td class="n">6,988,972</td><td class="n">14.95</td></tr>
+        </tbody>
+      </table>
+      <div class="note mt12">归集方式：网关流水 + Codex 会话文件按 token 数配对，Codex 没记的续写按对话时间区间吸收。<b>只读，不改任何一方代码。</b></div>
+    </div>
+  </section>
+
+  <section class="page" id="p-auth">
+    <div class="top"><div><h1>授权中心</h1><p>账号凭证来源与授权状态</p></div></div>
+    <div class="g g2">
+      <div class="card"><div class="ct"><h3>当前账号凭证</h3></div>
+        <div class="kv"><span>来源</span><b>桌面客户端导入</b></div>
+        <div class="kv"><span>文件</span><b class="mono">accounts/0d184d35….json</b></div>
+        <div class="kv"><span>refreshToken</span><b class="free">有效</b></div>
+        <div class="kv"><span>到期</span><b>30 天后</b></div>
+        <div class="kv"><span>存储方式</span><b class="bad">明文落盘</b></div>
+        <div class="note warnbox mt12"><b>该目录含长期访问权</b>：不要外传、不要放进同步盘与备份。不用时在此删除账号。</div></div>
+      <div class="card"><div class="ct"><h3>重新授权</h3></div>
+        <div class="row"><button class="btn p">从桌面客户端导入</button><button class="btn">浏览器登录</button></div>
+        <p class="sub fs12 mt12">导入需要 WorkBuddy 客户端正在运行且已登录（Windows 上要从进程内存取解密密钥）。</p></div>
+    </div>
+  </section>
+
+  <section class="page" id="p-usage">
+    <div class="top"><div><h1>用量统计</h1><p>每个账号 × 模型在当前 24 小时窗口的已用 / 预算 / 剩余</p></div></div>
+    <div class="card">
+      <div class="ct"><h3>24 小时窗口</h3><span class="hint">预算取撞线账号的平均用量</span></div>
+      <table>
+        <thead><tr><th>账号</th><th>模型</th><th class="n">已用</th><th class="n">预算</th><th class="n">剩余</th></tr></thead>
+        <tbody>
+          <tr><td>六只羊🐑</td><td>deepseek-v4.1-flash</td><td class="n">14.95</td><td class="n">60.00</td><td class="n free">45.05</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+</main>
+
+<script>
+document.querySelectorAll('.nav').forEach(function(n){
+  n.addEventListener('click', function(){
+    document.querySelectorAll('.nav').forEach(function(x){x.classList.remove('on')});
+    n.classList.add('on');
+    var p = n.getAttribute('data-p');
+    document.querySelectorAll('.page').forEach(function(s){s.classList.remove('on')});
+    var el = document.getElementById('p-' + p);
+    if (el) el.classList.add('on');
+    document.querySelector('.main').scrollTop = 0;
+  });
+});
+document.querySelectorAll('.sw').forEach(function(s){
+  s.addEventListener('click', function(){ s.classList.toggle('on'); });
+});
+document.querySelectorAll('.seg').forEach(function(seg){
+  seg.querySelectorAll('button').forEach(function(b){
+    b.addEventListener('click', function(){
+      seg.querySelectorAll('button').forEach(function(x){x.classList.remove('on')});
+      b.classList.add('on');
+    });
+  });
+});
+</script>
+</body>
+</html>
