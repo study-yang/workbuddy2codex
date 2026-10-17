@@ -36,18 +36,22 @@ sys.path.insert(0, GW)
 sys.path.insert(0, HERE)
 
 import wb_sessions as ws          # noqa: E402  本项目自己的归集逻辑
+import wb_panel_data as wpd       # noqa: E402  自建面板的数据层
 import wb_proxy                   # noqa: E402  上游网关（作为模块导入，不自动启动）
 
 USAGE_LOG = os.path.join(GW, "usage", "usage.jsonl")
 CODEX_SESSIONS = os.path.expanduser("~/.codex/sessions")
 SRC_HTML = os.path.join(GW, "dashboard.html")
 JS_FILE = os.path.join(HERE, "panel_sessions.js")
+PANEL_HTML = os.path.join(HERE, "wb-panel.html")
 CACHE_DIR = os.path.join(HERE, ".cache")
 LOCAL_HTML = os.path.join(CACHE_DIR, "dashboard.wbsc.html")
 STAMP_FILE = os.path.join(CACHE_DIR, "dashboard.wbsc.stamp")
 
 API_PATH = "/sessions"
 JS_PATH = "/__wbsc.js"
+PANEL_PATH = "/wb-panel"
+PANEL_DATA_PATH = "/wb-panel/data"
 
 # 数据缓存：每次刷新都要扫一遍 Codex 会话文件，几秒钟的量级，
 # 面板 60 秒自动拉一次，没必要每次都重算。
@@ -152,6 +156,24 @@ def _install():
         except (BrokenPipeError, ConnectionResetError, ConnectionAbortedError):
             self.close_connection = True
 
+    def _send_panel(self):
+        """自建面板页面。每次请求都重新读文件，改完刷新即可见，不用重启网关。"""
+        try:
+            with open(PANEL_HTML, "rb") as fh:
+                body = fh.read()
+        except Exception as exc:
+            return self.send_error(404, "wb-panel.html missing: %s" % exc)
+        self.send_response(200)
+        self.send_header("Content-Type", "text/html; charset=utf-8")
+        self.send_header("Content-Length", str(len(body)))
+        self.send_header("Cache-Control", "no-cache")
+        self.end_headers()
+        self.wfile.write(body)
+        try:
+            self.wfile.flush()
+        except (BrokenPipeError, ConnectionResetError, ConnectionAbortedError):
+            self.close_connection = True
+
     def do_GET(self):
         path = (self.path or "").split("?", 1)[0]
         if path == API_PATH or path == "/v1" + API_PATH:
@@ -165,10 +187,22 @@ def _install():
             if not _local_ok(self):
                 return self._error(403, "local access only", "invalid_request_error")
             return _send_js(self)
+        if path in (PANEL_PATH, PANEL_PATH + "/", PANEL_PATH + "/index.html"):
+            if not _local_ok(self):
+                return self._error(403, "local access only", "invalid_request_error")
+            return _send_panel(self)
+        if path == PANEL_DATA_PATH:
+            if not _local_ok(self):
+                return self._error(403, "local access only", "invalid_request_error")
+            try:
+                return self._json(200, wpd.build_payload())
+            except Exception as exc:
+                return self._error(500, "panel data unavailable: %s" % exc)
         return orig_do_GET(self)
 
     Handler.do_GET = do_GET
     print("[wbsc] 已注册 %s 与 %s" % (API_PATH, JS_PATH))
+    print("[wbsc] 自建面板：http://127.0.0.1:8788%s （数据 %s）" % (PANEL_PATH, PANEL_DATA_PATH))
 
 
 def main():
