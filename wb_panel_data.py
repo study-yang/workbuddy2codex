@@ -506,6 +506,76 @@ def _block_tasks(checkin, today):
     ]
 
 
+def invalidate():
+    """动作改过状态后调用，下一次 build_payload() 重新算。"""
+    _CACHE["at"] = 0.0
+    _CACHE["data"] = None
+
+
+def _block_clients():
+    """本机 AI 客户端的真实检测结果（装没装、配没配）。
+
+    直接读 wb_agents.overview()：它已经做了探测、也记录了「上一次是不是本工具
+    配的」，这里只负责翻译成面板要的形状。
+    """
+    try:
+        import wb_agents
+        raw = wb_agents.overview(WP.ACCOUNTS_DIR) or {}
+    except Exception:
+        return None   # None = 交给面板的示例数据兜底
+
+    STYLE = {
+        "codex":       ("CX", "#10a37f"),
+        "claude-code": ("CC", "#d97757"),
+        "dsh":         ("DS", "#5b6cff"),
+        "crush":       ("CR", "#8e8e93"),
+        "opencode":    ("OC", "#8e8e93"),
+        "zcode":       ("ZC", "#8e8e93"),
+    }
+    ORDER = ["codex", "claude-code", "dsh", "crush", "opencode"]
+    out = []
+    for key in ORDER:
+        c = raw.get(key)
+        if not c:
+            continue
+        ab, color = STYLE.get(key, (key[:2].upper(), "#8e8e93"))
+        installed = bool(c.get("installed"))
+        configured = bool(c.get("configured"))
+        applied = bool(c.get("applied"))
+        if configured and applied:
+            tag, tag_cls, action, primary = "使用中", "g", "一键还原", False
+            desc = "已配置 · 由本网关写入（可字节级还原）"
+        elif configured:
+            tag, tag_cls, action, primary = "已配置", "", "一键还原", False
+            desc = "已配置 · 不是本网关写入的，还原前请确认"
+        elif installed:
+            tag, tag_cls, action, primary = "未接入", "", "一键配置", True
+            desc = "已安装 · 未指向本网关"
+        else:
+            tag, tag_cls, action, primary = "未安装", "", "一键配置", False
+            desc = "未检测到安装"
+        paths = c.get("config_paths") or []
+        out.append({
+            "n": c.get("label") or key,
+            "ab": ab,
+            "color": color,
+            "desc": desc,
+            "tag": tag,
+            "tagCls": tag_cls,
+            "action": action,
+            "confirm": ("会把该客户端的配置指向本网关，原文件自动备份到 "
+                        "accounts/agent-backups/。" if action == "一键配置"
+                        else "会把配置写回首次接入前的原件，之后需要重新配置。"),
+            "primary": primary,
+            "disabled": (not installed),
+            "key": key,
+            "configured": configured,
+            "installed": installed,
+            "paths": paths,
+        })
+    return out
+
+
 def _block_logs(limit=40):
     try:
         d = WP.get_logs(limit=limit) or {}
@@ -645,6 +715,7 @@ def build_payload():
         "byPair": by_pair,
         "tasks": _block_tasks(checkin, today),
         "scheduler": _block_scheduler(),
+        "clientsRaw": _block_clients(),
         "logs": logs,
         "conversations": convs,
         "notes": notes,

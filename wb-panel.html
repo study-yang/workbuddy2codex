@@ -437,27 +437,27 @@ tbody tr:hover td{background:rgba(128,128,128,.07)}
   <div class="tb">
     <div class="tb-g">
       <button class="btn xs p" data-confirm="打开登录弹窗：浏览器 OAuth 或粘贴 token 两种方式，导入后立即计入账号池。">添加</button>
-      <button class="btn xs" data-confirm="需要 WorkBuddy 桌面端正在运行且已登录；网关会从进程内存回收密钥解开 $wbEncrypted 信封，只读、密钥不落盘。">扫描桌面客户端</button>
+      <button class="btn xs" data-act="scan_desktop" data-confirm="需要 WorkBuddy 桌面端正在运行且已登录；网关会从进程内存回收密钥解开 $wbEncrypted 信封，只读、密钥不落盘。">扫描桌面客户端</button>
       <button class="btn xs" data-confirm="打开「签到与活跃记录」面板（本页下方），只看签到与每日活跃的流水。">签到记录</button>
-      <button class="btn xs" data-confirm="从此前导出的 JSON 文件恢复账号，重复 uid 会自动跳过。">导入</button>
-      <button class="btn xs" data-confirm="导出全部账号为 JSON（凭据加密存放）。">导出</button>
+      <button class="btn xs" onclick="doImport()" data-confirm="">导入</button>
+      <button class="btn xs" onclick="doExport()">导出</button>
     </div>
     <span class="sep"></span>
     <div class="tb-g">
-      <button class="btn xs" data-confirm="POST /accounts/credits —— 逐个账号向上游查一次余额，约 1~3 秒。">一键刷新积分</button>
-      <button class="btn xs" data-confirm="POST /accounts/refresh —— 逐个刷新所有账号的上游访问凭证（相当于对每个账号点一次「刷新凭证」）。">一键刷新凭证</button>
-      <button class="btn xs" data-confirm="POST /accounts/test（不带 uid）—— 每个账号各发一条最小请求 + 一条本机连通性测试，能分清「账号坏了」和「本机断网了」，通过后清掉熔断/降权计数。">一键测试</button>
+      <button class="btn xs" data-act="refresh_credits" data-confirm="逐个账号向上游查一次余额，约 1~3 秒，会消耗一次上游请求。">一键刷新积分</button>
+      <button class="btn xs" data-act="refresh_tokens" data-confirm="逐个刷新所有账号的上游访问凭证。">一键刷新凭证</button>
+      <button class="btn xs" data-act="test_all" data-confirm="每个账号各发一条最小请求 + 一条本机连通性测试（真实请求，会消耗少量积分），能分清「账号坏了」和「本机断网了」。">一键测试</button>
     </div>
     <span class="sep"></span>
     <div class="tb-g">
-      <button class="btn xs" data-confirm="Buddy 加油站签到：领取当日加油奖励，成功 +30~50 积分。">Buddy 加油站签到</button>
-      <button class="btn xs" data-confirm="把尚未绑定出口的已启用账号，依次分配到已启用的代理槽；已有绑定的账号不受影响。">一键分配代理</button>
-      <button class="btn xs" id="btnCycleId" data-confirm="循环切换所有账号的出站身份：WB（桌面客户端）→ VSC（VSCode 插件）→ CLI（命令行）。三者对应不同的出站指纹与配额通道。">一键切换所有出站身份：WB</button>
+      <button class="btn xs" data-act="checkin" data-confirm="Buddy 加油站签到：领取当日加油奖励。">Buddy 加油站签到</button>
+      <button class="btn xs" data-act="assign_proxy" data-confirm="把尚未绑定出口的已启用账号，依次分配到已启用的代理槽；已有绑定的账号不受影响。">一键分配代理</button>
+      <button class="btn xs" id="btnCycleId" data-act="product_all" data-product="vscode" data-confirm="把全部账号的出站身份切到 VSC（VSCode 插件）。三种身份对应不同的出站指纹与配额通道。">一键切换所有出站身份：WB</button>
     </div>
     <span class="sep"></span>
     <div class="tb-g">
-      <button class="btn xs" data-confirm="POST /accounts/set {enabled:true} —— 启用所有账号。">全部启用</button>
-      <button class="btn xs dgr" data-confirm="POST /accounts/set {enabled:false} —— 停用所有账号，停用后请求会失败，确认？">全部停用</button>
+      <button class="btn xs" data-act="set_all" data-enabled="1" data-confirm="启用所有账号。">全部启用</button>
+      <button class="btn xs dgr" data-act="set_all" data-enabled="0" data-confirm="停用所有账号。停用后 Codex 的请求会直接失败，确认？">全部停用</button>
     </div>
   </div>
 
@@ -488,7 +488,7 @@ tbody tr:hover td{background:rgba(128,128,128,.07)}
       <select class="sel" id="act-task"><option>全部任务</option><option>国内版签到</option><option>国际版每日活跃</option></select>
       <select class="sel" id="act-res"><option>全部结果</option><option>成功</option><option>失败</option></select>
       <select class="sel" id="act-acct"><option>全部账号</option><option selected>六只羊🐑</option></select>
-      <button class="btn xs" data-confirm="GET /activity/history —— 拉取签到与每日活跃的执行流水。">刷新</button>
+      <button class="btn s" onclick="refreshData().then(function(){toast('已刷新')})">刷新</button>
     </div></div>
   <table>
     <thead><tr><th style="width:130px">时间</th><th style="width:120px">账号</th><th class="c" style="width:76px">区域</th>
@@ -539,7 +539,7 @@ tbody tr:hover td{background:rgba(128,128,128,.07)}
           <div class="seg" id="seg-model">
             <button class="on" data-v="compact">紧凑</button><button data-v="detail">详细</button>
           </div>
-          <button class="btn s" data-confirm="立即向上游拉取一次模型目录（含最新倍率），约 1~3 秒。">刷新模型</button>
+          <button class="btn s" data-act="catalog_refresh" data-confirm="立即向上游拉取一次模型目录（含最新倍率），约 1~3 秒。">刷新模型</button>
         </div></div>
       <div class="scroll" style="max-height:300px">
         <table id="t-models">
@@ -564,8 +564,8 @@ tbody tr:hover td{background:rgba(128,128,128,.07)}
       <div class="tools">
         <span class="pill ok"><span class="dot"></span>调度器已启用</span>
         <span class="hint">下次执行 <b id="sched-next">—</b></span>
-        <button class="btn" data-confirm="暂停后所有定时任务停止，直到重新启用。确定暂停？">暂停调度</button>
-        <button class="btn p" data-confirm="立即执行一轮全部定时任务（签到 / 活跃 / 猫猫 / 保活）。">立即执行一次</button>
+        <button class="btn" data-act="scheduler_toggle" data-enabled="0" data-confirm="暂停后所有定时任务停止（不会自动签到、不会保活凭证），直到重新启用。确定暂停？">暂停调度</button>
+        <button class="btn p" data-act="scheduler_trigger" data-confirm="立即执行一轮全部定时任务（签到 / 活跃 / 猫猫 / 保活）。">立即执行一次</button>
       </div>
     </div>
 
@@ -681,7 +681,7 @@ tbody tr:hover td{background:rgba(128,128,128,.07)}
     </div>
 
     <div class="card mt">
-      <div class="ct"><h3>定价与取价状态</h3><button class="btn s" data-confirm="立即向 OpenRouter 取一次价，可能耗时几十秒。">立即取价</button></div>
+      <div class="ct"><h3>定价与取价状态</h3><button class="btn s" data-act="pricing_refresh" data-confirm="立即向 OpenRouter 取一次价，可能耗时几十秒。">立即取价</button></div>
       <div class="g g3">
         <div><div class="lbl">当前策略</div><div class="mono">632d48edd5ae</div></div>
         <div><div class="lbl">上次取价</div><div><b>16:40</b> · 42 个模型</div></div>
@@ -850,6 +850,7 @@ tbody tr:hover td{background:rgba(128,128,128,.07)}
   <button title="设置" id="dock-set"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg></button>
 </div>
 
+<input type="file" id="file-in" accept=".json,application/json" style="display:none" />
 <div id="boot"><span class="sp"></span>正在从网关拉取实时数据…</div>
 <div id="offline"><b>离线预览</b><span>拉不到网关数据，显示的是示例值。网关没起？双击 start-gateway.bat</span></div>
 <div class="tip" id="tip"></div>
@@ -1093,12 +1094,14 @@ function renderAccountTable(){
     h+='<tr>'
       +'<td class="c"><span class="tg '+(a.realm==='cn'?'b':'')+'">'+(a.realm==='cn'?'国内版':'国际版')+'</span></td>'
       +'<td><span class="acct-name" title="'+esc(a.nick)+'">'+esc(a.nick)+'</span>'
-      +'<span class="note-chip" data-confirm="账号备注（留空清除；可用来标记「批量」/「自用」）">'+(a.note?esc(a.note):'+ 备注')+'</span>'
+      +'<span class="note-chip" onclick="editNote(this)" data-uid="'+esc(a.uid)+'" data-note="'+esc(a.note||'')+'">'+(a.note?esc(a.note):'+ 备注')+'</span>'
       +'<div class="acct-meta mono">'+esc(a.source)+'：'+esc(a.uid.slice(0,5))+'… · 剩 '+a.expIn+' 天</div></td>'
       +'<td class="c"><span class="tg '+(a.enabled?'g':'r')+'">'+(a.enabled?'可用':'已停用')+'</span></td>'
       +'<td class="c"><span class="tags">'+a.today.map(function(t){return '<span class="tg g">'+esc(t)+'</span>';}).join('')+'</span></td>'
       +'<td class="c"><span class="fs12 sub">'+esc(a.exit)+'</span></td>'
-      +'<td class="c"><select class="sel" style="padding:2px 6px;font-size:12px"><option>1</option><option>2</option><option>3</option></select></td>'
+      +'<td class="c"><select class="sel" style="padding:2px 6px;font-size:12px" data-uid="'+esc(a.uid)+'" onchange="setWeight(this)">'
+      +[1,2,3,4,5].map(function(w){ return '<option value="'+w+'"'+(a.weight===w?' selected':'')+'>'+w+'</option>'; }).join('')
+      +'</select></td>'
       +'<td><div class="row b"><b class="v">'+a.remain.toFixed(2)+'</b><span class="fs12 sub">/ '+a.size.toFixed(0)+'</span></div>'
       +'<div class="fs11 sub'+(soon?' warn':'')+'">'+a.expEnd+' 到期'+(soon?' · 即将过期':'')+'</div></td>'
       +'<td class="n v">'+a.req+'</td>'
@@ -1106,19 +1109,21 @@ function renderAccountTable(){
       +'<td class="n v">'+esc(a.cache)+'</td>'
       +'<td class="c"><div class="acct-ops">'
       +'<div class="acts">'
-      +'<button class="btn xs'+(a.enabled?'':' p')+'" data-confirm="'+(a.enabled?'停用后该账号不再接收请求，确认？':'重新启用该账号。')+'">'+(a.enabled?'停用':'启用')+'</button>'
-      +'<button class="btn xs" data-confirm="POST /accounts/test {uid} —— 对该账号发一条最小请求，同时测本机到上游的连通性。">测试</button>'
-      +'<button class="btn xs" data-confirm="POST /accounts/refresh {uid} —— 刷新该账号的上游访问凭证。">刷新凭证</button>'
-      +'<button class="btn xs" data-confirm="从 Web 控制台同步最新昵称（改名后免重登）。">同步昵称</button>'
+      +'<button class="btn xs'+(a.enabled?'':' p')+'" data-act="set_enabled" data-uid="'+esc(a.uid)+'" data-enabled="'+(a.enabled?'0':'1')+'" data-confirm="'+(a.enabled?'停用后该账号不再接收请求，Codex 的调用会落到其它账号或直接失败。确认停用？':'重新启用该账号，恢复接单。')+'">'+(a.enabled?'停用':'启用')+'</button>'
+      +'<button class="btn xs" data-act="test_all" data-uid="'+esc(a.uid)+'" data-confirm="对该账号真发一条最小请求，并同时测本机到上游的连通性（会消耗少量积分）。">测试</button>'
+      +'<button class="btn xs" data-act="refresh_tokens" data-uid="'+esc(a.uid)+'" data-confirm="刷新该账号的上游访问凭证。">刷新凭证</button>'
+      +'<button class="btn xs" data-act="sync_profile" data-uid="'+esc(a.uid)+'" data-confirm="从 Web 控制台同步最新昵称（改名后免重登）。">同步昵称</button>'
       +'</div>'
       +'<span class="fs11 sub">出站身份</span>'
       +'<span class="id-btn-group">'
       +['workbuddy','vscode','cli'].map(function(p){
-        return '<button class="id-btn'+(a.product===p?' on':'')+'" data-id="'+p+'">'+ID_NAME[p]+'</button>';
+        return '<button class="id-btn'+(a.product===p?' on':'')+'" data-id="'+p+'"'
+          +' data-act="set_product" data-uid="'+esc(a.uid)+'" data-product="'+p+'"'
+          +' data-confirm="把该账号的出站身份切到 '+ID_NAME[p]+'（WB=桌面客户端 / VSC=VSCode 插件 / CLI=命令行）。三者出站指纹与配额通道不同，切完建议跑一次「测试」。">'+ID_NAME[p]+'</button>';
       }).join('')
       +'</span>'
-      +'<button class="btn xs" data-confirm="导出该账号为 JSON（凭据加密存放）。">导出</button>'
-      +'<button class="btn xs dgr" data-confirm="删除账号「'+esc(a.nick)+'」？只删网关里的记录，不影响 WorkBuddy 账号本身；该账号的凭证会一并抹掉。">删除</button>'
+      +'<button class="btn xs" onclick="doExport(\''+esc(a.uid)+'\')">导出</button>'
+      +'<button class="btn xs dgr" data-act="delete" data-uid="'+esc(a.uid)+'" data-title="⚠️ 删除账号" data-confirm="即将删除账号「'+esc(a.nick)+'」。只删网关里的记录（含该账号的凭据文件），不影响 WorkBuddy 账号本身，重新导入即可恢复。此操作不可撤销，确认删除？">删除</button>'
       +'</div></td></tr>';
   }
   $('t-acc-body').innerHTML=h;
@@ -1144,28 +1149,162 @@ function renderActivity(){
 }
 
 /* 出站身份按钮组：点谁切谁 */
+/* 出站身份的视觉切换交给确认弹窗之后的重新渲染，这里只做「点下去先反馈」 */
 document.addEventListener('click',function(e){
   var b=e.target&&e.target.closest?e.target.closest('.id-btn'):null;
   if(!b) return;
   var grp=b.parentNode;
   grp.querySelectorAll('.id-btn').forEach(function(x){x.classList.remove('on')});
   b.classList.add('on');
-  var p=b.getAttribute('data-id');
-  toast('出站身份已切到 '+ID_NAME[p]+'（预览模式，接入后写 /accounts/set {product:"'+p+'"}）');
 });
 
 /* 一键切换所有出站身份：WB → VSC → CLI 循环 */
+/* 一键切换所有出站身份：按钮文字跟着目标走，点确认才真切 */
 (function(){
-  var idx=0, btn=$('btnCycleId');
+  var btn=$('btnCycleId');
   if(!btn) return;
-  btn.addEventListener('click',function(){
-    idx=(idx+1)%3;
-    var p=ID_CYCLE[idx];
+  var cur=(DATA.accountsTbl&&DATA.accountsTbl[0]&&DATA.accountsTbl[0].product)||'workbuddy';
+  var idx=Math.max(0, ID_CYCLE.indexOf(cur));
+  function paint(){
+    var p=ID_CYCLE[(idx+1)%3];
     btn.textContent='一键切换所有出站身份：'+ID_NAME[p];
-    toast('将把全部账号的出站身份切到 '+ID_NAME[p]+'（预览模式）');
-  });
+    btn.setAttribute('data-product', p);
+    btn.setAttribute('data-confirm','把全部账号（含另一个版本）的出站身份切到 '+ID_NAME[p]+'。三种身份对应不同的出站指纹与配额通道，切完建议跑一次「一键测试」。');
+  }
+  paint();
 })();
 
+
+
+/* ============ 写操作：统一走 /wb-panel/action ============ */
+function act(name, params){
+  return fetch('/wb-panel/action',{
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({action:name, params:params||{}})
+  }).then(function(r){ return r.json(); }).then(function(d){
+    if(!d || !d.ok) throw new Error((d && d.error) || '网关拒绝了这次操作');
+    return d.result;
+  });
+}
+
+/* 结果摘要：把各接口五花八门的返回压成一句话 */
+function actSummary(name, r){
+  if(!r) return '完成';
+  if(typeof r === 'string') return r;
+  if(name==='refresh_credits'){
+    var n=(r.results||[]).filter(function(x){return x.ok;}).length;
+    return '已刷新 '+(n||(r.results||[]).length)+' 个账号的积分';
+  }
+  if(name==='refresh_tokens'){
+    var m=(r.results||[]).filter(function(x){return x.ok;}).length;
+    return '已刷新 '+m+' 个账号的凭证';
+  }
+  if(name==='test_all'){
+    if(r.rows){ var ok=r.rows.filter(function(x){return x.ok;}).length; return ok+'/'+r.rows.length+' 个账号通过'; }
+    return r.ok ? '测试通过' : ('测试失败：'+(r.error||''));
+  }
+  if(name==='set_all') return r.enabled!==false ? '已全部启用' : '已全部停用';
+  if(name==='delete') return r.deleted ? '账号已删除' : '账号不存在或已删除';
+  if(name==='import') return '导入完成';
+  if(name==='export') return '已导出';
+  if(name==='assign_proxy') return (r.assigned!==undefined) ? ('已分配 '+r.assigned+' 个账号') : '完成';
+  if(name==='product_all'||name==='set_product') return '出站身份已切换';
+  if(name==='scheduler_trigger') return '已触发一轮调度';
+  if(name==='scheduler_toggle') return r.enabled===false ? '调度器已暂停' : '调度器已启用';
+  if(name==='catalog_refresh') return '模型目录已刷新';
+  if(name==='agents_apply') return '客户端配置已写入（原文件已备份）';
+  if(name==='agents_restore') return '已还原到接入前的原件';
+  if(name==='checkin') return '签到请求已发送';
+  if(name==='sync_profile') return '昵称已同步';
+  if(r.accounts) return '完成（当前 '+r.accounts.length+' 个账号）';
+  return '完成';
+}
+
+function busy(on, text){
+  var b=$('boot');
+  if(on){ b.innerHTML='<span class="sp"></span>'+(text||'正在执行…'); b.classList.remove('off'); }
+  else { b.classList.add('off'); }
+}
+
+/* 执行一个动作：提示 → 调用 → toast → 重新拉数据 */
+function runAction(name, params, el, okMsg){
+  if(el && el.disabled) return;
+  if(el) el.disabled = true;
+  busy(true, '正在执行…');
+  return act(name, params).then(function(r){
+    busy(false);
+    toast((okMsg||actSummary(name, r)));
+    return refreshData();
+  }).catch(function(e){
+    busy(false);
+    toast('失败：'+e.message, 'bad');
+  }).then(function(){
+    if(el) el.disabled = false;
+  });
+}
+
+/* 只刷数据，不重渲染整个骨架 */
+function refreshData(){
+  return fetchData().then(function(d){
+    if(d && d.ok){ DATA = Object.assign({}, SAMPLE, d); OFFLINE=false; renderAll(); }
+  }).catch(function(){});
+}
+
+/* 导出：拿 JSON 直接落盘 */
+function doExport(uid){
+  busy(true,'正在打包…');
+  act('export', uid?{uid:uid}:{}).then(function(r){
+    busy(false);
+    var blob=new Blob([JSON.stringify(r,null,2)],{type:'application/json'});
+    var a=document.createElement('a');
+    a.href=URL.createObjectURL(blob);
+    a.download='wb-accounts-'+new Date().toISOString().slice(0,10)+'.json';
+    document.body.appendChild(a); a.click();
+    setTimeout(function(){ URL.revokeObjectURL(a.href); a.remove(); },1000);
+    toast('已导出（含凭据，别外传）');
+  }).catch(function(e){ busy(false); toast('导出失败：'+e.message,'bad'); });
+}
+
+/* 导入：选文件 → 读 JSON → 提交 */
+function doImport(){
+  var inp=$('file-in');
+  inp.value='';
+  inp.click();
+}
+document.addEventListener('DOMContentLoaded',function(){});
+function bindImport(){
+  var inp=$('file-in');
+  if(!inp) return;
+  inp.addEventListener('change',function(){
+    var f=inp.files && inp.files[0];
+    if(!f) return;
+    var fr=new FileReader();
+    fr.onload=function(){
+      var doc;
+      try{ doc=JSON.parse(fr.result); }
+      catch(e){ return toast('不是合法 JSON：'+e.message,'bad'); }
+      confirmDlg('确认导入','将从「'+f.name+'」导入账号，uid 重复的会跳过。',function(){
+        runAction('import',{data:doc},null,null);
+      });
+    };
+    fr.readAsText(f);
+  });
+}
+
+/* 权重：改了就提交（上游按权重决定谁先接单，>1 表示优先） */
+function setWeight(sel){
+  var uid=sel.getAttribute('data-uid'), w=Number(sel.value);
+  runAction('set_weight', {uid:uid, weight:w}, null, '权重已设为 '+w);
+}
+
+/* 备注：prompt 输入，留空即清除 */
+function editNote(el){
+  var uid=el.getAttribute('data-uid');
+  var cur=el.getAttribute('data-note')||'';
+  var next=prompt('账号备注（留空清除；可用来标记「批量」/「自用」）:', cur);
+  if(next===null) return;
+  runAction('set_note', {uid:uid, note:next}, null, next.trim()?'备注已保存':'备注已清除');
+}
 
 /* ============ 剩余用量估算 ============ */
 function renderEstimate(){
@@ -1431,7 +1570,7 @@ function renderTasks(){
 }
 
 function renderClients(){
-  DATA.clients = DATA.clients || [];
+  DATA.clients = (DATA.clientsRaw && DATA.clientsRaw.length) ? DATA.clientsRaw : (DATA.clients || []);
   var h='';
   for(var i=0;i<DATA.clients.length;i++){
     var c=DATA.clients[i];
@@ -1439,6 +1578,7 @@ function renderClients(){
       +'<div style="flex:1;min-width:190px"><h4>'+esc(c.n)+'</h4><p>'+esc(c.desc)+'</p></div>'
       +'<span class="tg '+c.tagCls+'">'+esc(c.tag)+'</span>'
       +'<button class="btn s'+(c.primary?' p':'')+'" '+(c.disabled?'disabled':'')
+      +' data-act="'+(c.action==='一键还原'?'agents_restore':'agents_apply')+'" data-client="'+esc(c.key||'')+'"'
       +' data-confirm="'+esc(c.confirm)+'">'+esc(c.action)+'</button></div>';
   }
   $('cli-list').innerHTML=h;
@@ -1502,8 +1642,20 @@ $('mask').addEventListener('click',function(e){ if(e.target===$('mask')){ $('mas
 document.addEventListener('click',function(e){
   var el=e.target && e.target.closest ? e.target.closest('[data-confirm]') : null;
   if(!el) return;
+  var actName=el.getAttribute('data-act');
+  if(!actName) return;              // 没挂动作的，交给各自的 onclick
   e.preventDefault();
-  confirmDlg('确认操作', el.getAttribute('data-confirm'), function(){});
+  var uid=el.getAttribute('data-uid') || undefined;
+  var extra={};
+  if(el.getAttribute('data-enabled')!==null) extra.enabled = el.getAttribute('data-enabled')==='1';
+  if(el.getAttribute('data-product')) extra.product = el.getAttribute('data-product');
+  if(el.getAttribute('data-client')) extra.client = el.getAttribute('data-client');
+  if(el.getAttribute('data-weight')) extra.weight = Number(el.getAttribute('data-weight'));
+  if(el.hasAttribute('data-note')) extra.note = el.getAttribute('data-note');
+  if(uid) extra.uid = uid;
+  confirmDlg(el.getAttribute('data-title')||'确认操作',
+             el.getAttribute('data-confirm'),
+             function(){ runAction(actName, extra, el); });
 });
 
 function openPage(key){
@@ -1590,6 +1742,7 @@ try{
   var st=localStorage.getItem('wb-theme');
   if(st) setTheme(st);
 }catch(e){}
+bindImport();
 boot();
 </script>
 </body>

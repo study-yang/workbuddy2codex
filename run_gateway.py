@@ -36,6 +36,7 @@ sys.path.insert(0, GW)
 sys.path.insert(0, HERE)
 
 import wb_sessions as ws          # noqa: E402  本项目自己的归集逻辑
+import wb_panel_action as wpa     # noqa: E402  面板的写操作执行器
 import wb_panel_data as wpd       # noqa: E402  自建面板的数据层
 import wb_proxy                   # noqa: E402  上游网关（作为模块导入，不自动启动）
 
@@ -52,6 +53,7 @@ API_PATH = "/sessions"
 JS_PATH = "/__wbsc.js"
 PANEL_PATH = "/wb-panel"
 PANEL_DATA_PATH = "/wb-panel/data"
+PANEL_ACTION_PATH = "/wb-panel/action"
 
 # 数据缓存：每次刷新都要扫一遍 Codex 会话文件，几秒钟的量级，
 # 面板 60 秒自动拉一次，没必要每次都重算。
@@ -91,6 +93,38 @@ def _payload(limit=10, days=7):
     _CACHE["at"] = now
     _CACHE["data"] = data
     return data
+
+
+# ------------------------------------------------------------------ 余额摘要
+def _balance_summary():
+    """给第三方客户端（cc-switch 等）看的余额摘要。
+
+    形状对齐常见的 usage_script 契约：remaining / unit / is_active。
+    """
+    try:
+        accts = wb_proxy.account_views(realm=getattr(wb_proxy, "CURRENT_REALM", "cn")) or []
+    except Exception:
+        accts = []
+    remain = used = size = 0.0
+    nick = ""
+    for a in accts:
+        c = a.get("credits") or {}
+        if c.get("remain") is None:
+            continue
+        remain += float(c.get("remain") or 0)
+        used += float(c.get("used") or 0)
+        size += float(c.get("size") or 0)
+        nick = nick or (a.get("nickname") or "")
+    return {
+        "object": "usage",
+        "remaining": round(remain, 2),
+        "used": round(used, 2),
+        "total": round(size, 2),
+        "unit": "credits",
+        "is_active": bool(accts),
+        "account": nick,
+        "realm": getattr(wb_proxy, "CURRENT_REALM", "cn"),
+    }
 
 
 # ------------------------------------------------------------------ 面板副本
@@ -198,11 +232,53 @@ def _install():
                 return self._json(200, wpd.build_payload())
             except Exception as exc:
                 return self._error(500, "panel data unavailable: %s" % exc)
+        # 余额查询兼容层：cc-switch 之类的客户端只会带 API key 来探余额，
+        # 而网关的 /v1/usage 是面板接口（要面板令牌）。这里只对**本机 +
+        # 没带面板令牌**的请求返回一份余额摘要，带上面板令牌的仍走原逻辑。
+        if path in ("/v1/usage", "/usage") and not (self.headers.get("X-Panel-Token") or "").strip():
+            if not _local_ok(self):
+                return self._error(403, "local access only", "invalid_request_error")
+            try:
+                return self._json(200, _balance_summary())
+            except Exception as exc:
+                return self._error(500, "balance unavailable: %s" % exc)
         return orig_do_GET(self)
 
     Handler.do_GET = do_GET
+
+    # ---- 写操作：POST /wb-panel/action ----
+    orig_do_POST = Handler.do_POST
+
+    def do_POST(self):
+        path = (self.path or "").split("?", 1)[0]
+        if path != PANEL_ACTION_PATH:
+            return orig_do_POST(self)
+        if not _local_ok(self):
+            return self._error(403, "local access only", "invalid_request_error")
+        try:
+            length = int(self.headers.get("Content-Length") or 0)
+        except (TypeError, ValueError):
+            length = 0
+        raw = self.rfile.read(length) if length else b""
+        try:
+            body = json.loads(raw.decode("utf-8")) if raw else {}
+        except Exception as exc:
+            return self._error(400, "expect JSON body: %s" % exc)
+        action = (body.get("action") or "").strip()
+        params = body.get("params") or {}
+        host, port = self.server.server_address[0], self.server.server_address[1]
+        base = "http://%s:%s" % (host if host not in ("0.0.0.0", "::") else "127.0.0.1", port)
+        ok, data = wpa.run(action, params, base)
+        # 动作会改状态，数据层缓存作废，下一次拉 /wb-panel/data 必须是新的
+        wpd.invalidate()
+        if not ok:
+            return self._json(200, {"ok": False, "action": action, "error": data})
+        return self._json(200, {"ok": True, "action": action, "result": data})
+
+    Handler.do_POST = do_POST
     print("[wbsc] 已注册 %s 与 %s" % (API_PATH, JS_PATH))
-    print("[wbsc] 自建面板：http://127.0.0.1:8788%s （数据 %s）" % (PANEL_PATH, PANEL_DATA_PATH))
+    print("[wbsc] 自建面板：http://127.0.0.1:8788%s （数据 %s · 动作 %s）"
+          % (PANEL_PATH, PANEL_DATA_PATH, PANEL_ACTION_PATH))
 
 
 def main():

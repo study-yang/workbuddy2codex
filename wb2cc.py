@@ -33,6 +33,24 @@ import urllib.request
 # ---- 固定标识：改这里会导致重复供应商 -------------------------------------
 PROVIDER_ID = "wb-proxy-local"      # 主键 (id, app_type)，固定 = 幂等
 PROVIDER_NAME = "WB Proxy"          # 在 cc-switch 列表里显示的名字
+
+# cc-switch 的「余额查询脚本」：它按 provider 各自的脚本去问余额，
+# 没写脚本的 provider 会一直显示 0%。网关为这类客户端准备了
+# GET {base}/usage 的余额摘要（remaining / unit / is_active）。
+USAGE_SCRIPT = """({
+  request: {
+    url: "{{baseUrl}}/usage",
+    method: "GET",
+    headers: { "Authorization": "Bearer {{apiKey}}" }
+  },
+  extractor: function(response) {
+    return {
+      isValid: response && (response.is_active !== false),
+      remaining: (response && response.remaining) || 0,
+      unit: (response && response.unit) || "credits"
+    };
+  }
+})"""
 APP_TYPE = "codex"
 DEFAULT_GATEWAY = "http://127.0.0.1:8788"
 DEFAULT_MODEL = "deepseek-v4.1-flash"
@@ -218,7 +236,12 @@ def upsert(db_path, settings_config, sort_index, existed):
                     "where id=? and app_type=?",
                     (PROVIDER_NAME, payload,
                      json.dumps({"apiFormat": "openai_responses",
-                                 "commonConfigEnabled": False}),
+                                 "commonConfigEnabled": False,
+                                 "usage_script": {"enabled": True,
+                                                  "language": "javascript",
+                                                  "code": USAGE_SCRIPT,
+                                                  "timeout": 10,
+                                                  "autoQueryInterval": 60}}, ensure_ascii=False),
                      PROVIDER_ID, APP_TYPE))
                 return "updated"
             con.execute(
@@ -230,7 +253,12 @@ def upsert(db_path, settings_config, sort_index, existed):
                 (PROVIDER_ID, APP_TYPE, PROVIDER_NAME, payload,
                  DEFAULT_GATEWAY, None, now_ms, sort_index, None, None, None,
                  json.dumps({"apiFormat": "openai_responses",
-                             "commonConfigEnabled": False}),
+                             "commonConfigEnabled": False,
+                             "usage_script": {"enabled": True,
+                                              "language": "javascript",
+                                              "code": USAGE_SCRIPT,
+                                              "timeout": 10,
+                                              "autoQueryInterval": 60}}, ensure_ascii=False),
                  0, 0, "1.0"))
             return "inserted"
     finally:
@@ -240,6 +268,46 @@ def upsert(db_path, settings_config, sort_index, existed):
 # --------------------------------------------------------------------------
 # 主流程
 # --------------------------------------------------------------------------
+
+def _fix_balance(args):
+    """只改 meta 里的 usage_script，其它列一个字节都不动。"""
+    db = find_db(args.db)
+    if not db:
+        print("没找到 cc-switch.db")
+        return 2
+    if ccswitch_running():
+        print("cc-switch 正在运行。它在内存里缓存着状态，现在写会被盖回去。")
+        print("请先完全退出（托盘图标也要退），再跑一次。")
+        return 3
+    con = sqlite3.connect(db, timeout=15)
+    try:
+        row = con.execute(
+            "select id, name, meta from providers where app_type=? and name=?",
+            (APP_TYPE, PROVIDER_NAME)).fetchone()
+        if not row:
+            print("cc-switch 里没有叫「%s」的供应商，先跑 --write 建一个。" % PROVIDER_NAME)
+            return 4
+        pid, name, raw_meta = row
+        try:
+            meta = json.loads(raw_meta) if raw_meta else {}
+        except Exception:
+            meta = {}
+        meta["usage_script"] = {
+            "enabled": True,
+            "language": "javascript",
+            "code": USAGE_SCRIPT,
+            "timeout": 10,
+            "autoQueryInterval": 60,
+        }
+        con.execute("update providers set meta=? where id=? and app_type=?",
+                    (json.dumps(meta, ensure_ascii=False), pid, APP_TYPE))
+        con.commit()
+        print("已给「%s」补上余额查询脚本。" % name)
+        print("重启 cc-switch 后，那个 0% 会变成真实余额（单位：积分）。")
+        return 0
+    finally:
+        con.close()
+
 
 def main(argv=None):
     global PROVIDER_NAME
@@ -254,7 +322,13 @@ def main(argv=None):
     ap.add_argument("--db", default=None, help="cc-switch.db 路径，默认自动查找")
     ap.add_argument("--write", action="store_true",
                     help="真正写入。不加这个参数 = 只预览")
+    ap.add_argument("--fix-balance", action="store_true",
+                    help="只给已有供应商补上「余额查询脚本」（不动配置与模型表），"
+                         "修 cc-switch 里一直显示 0% 的问题")
     args = ap.parse_args(argv)
+
+    if args.fix_balance:
+        return _fix_balance(args)
 
     PROVIDER_NAME = args.name
     base_url_v1 = args.gateway.rstrip("/")
