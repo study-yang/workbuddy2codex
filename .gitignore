@@ -1,0 +1,23 @@
+# 运行时数据与凭据：绝不提交
+gateway/accounts/
+gateway/usage/
+gateway/catalog/
+*.token
+.workbuddy/
+
+# 第三方上游项目（MIT，见 README 的致谢）
+# 需要时用 git submodule add 或按 README 手动克隆
+gateway/
+
+# 生成物
+.cache/
+__pycache__/
+*.pyc
+dashboard.wbsc.html
+dashboard.wbsc.stamp
+
+# 备份
+backups/
+
+# 本地临时
+*.log
