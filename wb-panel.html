@@ -7,33 +7,38 @@
 <style>
 /* ============ 主题变量 ============ */
 :root{
-  --bg:#f3f2ef; --card:rgba(255,255,255,.74); --card2:rgba(255,255,255,.52);
-  --line:rgba(0,0,0,.08); --line2:rgba(0,0,0,.05);
+  --bg:#f3f2ef; --card:rgba(255,255,255,.78); --card2:rgba(255,255,255,.55);
+  --line:rgba(0,0,0,.09); --line2:rgba(0,0,0,.055);
   --fg:#1d1d1f; --fg2:#3a3a3c; --sub:#7c7c80; --sub2:#a9a9ad;
-  --blue:#0071e3; --blue-bg:rgba(0,113,227,.09);
-  --green:#248a3d; --green-s:#34c759; --green-bg:rgba(52,199,89,.11);
-  --orange:#b25000; --orange-s:#ff9500; --orange-bg:rgba(255,149,0,.12);
-  --red:#d70015; --red-bg:rgba(255,59,48,.1);
-  --r:16px; --r2:11px;
-  --mono:ui-monospace,SFMono-Regular,"Cascadia Mono",Consolas,monospace;
+  --blue:#0071e3; --blue-bg:rgba(0,113,227,.10); --blue-line:rgba(0,113,227,.14);
+  --violet:#af52de; --violet-bg:rgba(175,82,222,.10);
+  --green:#248a3d; --green-s:#34c759; --green-bg:rgba(52,199,89,.12); --green-line:rgba(52,199,89,.28);
+  --orange:#b25000; --orange-s:#ff9500; --orange-bg:rgba(255,149,0,.13);
+  --red:#d70015; --red-bg:rgba(255,59,48,.11);
+  --r:16px; --r2:11px; --glass:blur(20px) saturate(1.35);
   --shadow:0 1px 2px rgba(0,0,0,.03),0 10px 28px rgba(0,0,0,.05);
-  --glow:radial-gradient(900px 420px at 10% -8%, rgba(0,113,227,.07), transparent 62%),
-         radial-gradient(760px 360px at 94% 2%, rgba(175,82,222,.05), transparent 60%),
-         radial-gradient(700px 340px at 50% 108%, rgba(52,199,89,.05), transparent 62%);
+  --glow:radial-gradient(880px 420px at 6% -8%, rgba(0,113,227,.14), transparent 62%),
+         radial-gradient(760px 380px at 96% -2%, rgba(175,82,222,.12), transparent 60%),
+         radial-gradient(660px 320px at 90% 86%, rgba(255,149,0,.09), transparent 62%),
+         radial-gradient(720px 360px at 44% 110%, rgba(52,199,89,.09), transparent 62%);
+  --logo:linear-gradient(150deg,#3b9bff,#af52de);
 }
+
 [data-theme="dark"]{
-  --bg:#1b1b1d; --card:rgba(38,38,41,.78); --card2:rgba(44,44,48,.6);
-  --line:rgba(255,255,255,.09); --line2:rgba(255,255,255,.06);
-  --fg:#f2f2f4; --fg2:#d8d8dc; --sub:#98989e; --sub2:#6e6e74;
-  --blue:#3b9bff; --blue-bg:rgba(59,155,255,.14);
-  --green:#3ddc6a; --green-s:#34c759; --green-bg:rgba(52,199,89,.15);
-  --orange:#ffab2e; --orange-s:#ff9500; --orange-bg:rgba(255,149,0,.16);
-  --red:#ff5f57; --red-bg:rgba(255,95,87,.15);
-  --shadow:0 1px 2px rgba(0,0,0,.2),0 12px 32px rgba(0,0,0,.28);
-  --glow:radial-gradient(900px 420px at 10% -8%, rgba(59,155,255,.09), transparent 62%),
-         radial-gradient(760px 360px at 94% 2%, rgba(199,125,223,.06), transparent 60%),
-         radial-gradient(700px 340px at 50% 108%, rgba(52,199,89,.05), transparent 62%);
+  --bg:#0d1117; --card:#161b22; --card2:#1c2128;
+  --line:#30363d; --line2:#21262d;
+  --fg:#e6edf3; --fg2:#c9d1d9; --sub:#8b949e; --sub2:#6e7681;
+  --blue:#58a6ff; --blue-bg:rgba(88,166,255,.12); --blue-line:rgba(88,166,255,.2);
+  --violet:#bc8cff; --violet-bg:rgba(188,140,255,.12);
+  --green:#3fb950; --green-s:#3fb950; --green-bg:rgba(63,185,80,.14); --green-line:rgba(63,185,80,.32);
+  --orange:#d29922; --orange-s:#e3b341; --orange-bg:rgba(210,153,34,.14);
+  --red:#f85149; --red-bg:rgba(248,81,73,.13);
+  --r:16px; --r2:11px; --glass:none;
+  --shadow:0 1px 2px rgba(1,4,9,.4);
+  --glow:none;
+  --logo:linear-gradient(150deg,#58a6ff,#1f6feb);
 }
+
 
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%}
@@ -55,14 +60,30 @@ b,strong{font-weight:650}
 .bad{color:var(--red)}
 .warn{color:var(--orange)}
 
+/* ============ 丰富化：彩色图标块 / hero 渐变 / 导航色条 ============ */
+.kpi-ic{position:absolute;top:15px;right:15px;width:34px;height:34px;border-radius:10px;
+  display:grid;place-items:center;backdrop-filter:var(--glass);-webkit-backdrop-filter:var(--glass)}
+.kpi-ic svg{width:17px;height:17px}
+.kpi-ic.b{background:var(--blue-bg);color:var(--blue)}
+.kpi-ic.o{background:var(--orange-bg);color:var(--orange)}
+.kpi-ic.g{background:var(--green-bg);color:var(--green)}
+.card.hero{position:relative;overflow:hidden;
+  background:linear-gradient(150deg,rgba(0,113,227,.075),rgba(175,82,222,.055)),var(--card)}
+[data-theme="dark"] .card.hero{background:linear-gradient(150deg,rgba(88,166,255,.09),rgba(188,140,255,.07)),var(--card)}
+.hero .big{background:linear-gradient(120deg,var(--blue),var(--violet));
+  -webkit-background-clip:text;background-clip:text;color:transparent}
+.nav{position:relative}
+.nav.on::before{content:"";position:absolute;left:0;top:9px;bottom:9px;width:3px;border-radius:0 3px 3px 0;
+  background:linear-gradient(180deg,var(--blue),var(--violet))}
+
 /* ============ 左侧导航 ============ */
 .rail{width:222px;flex:0 0 222px;padding:16px 12px;display:flex;flex-direction:column;gap:2px;
   border-right:1px solid var(--line);background:var(--card2);
-  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);overflow-y:auto;transition:width .2s}
+  backdrop-filter:var(--glass);-webkit-backdrop-filter:var(--glass);overflow-y:auto;transition:width .2s}
 .brand{display:flex;align-items:center;gap:10px;padding:4px 8px 14px}
 .logo{width:28px;height:28px;border-radius:9px;display:grid;place-items:center;color:#fff;
-  font-size:13px;font-weight:700;background:linear-gradient(150deg,#3b9bff,#0060df);
-  box-shadow:0 2px 10px rgba(0,113,227,.32)}
+  font-size:13px;font-weight:700;background:var(--logo);
+  box-shadow:0 2px 10px var(--blue-line)}
 .brand b{font-size:14.5px;font-weight:650;display:block;letter-spacing:-.1px}
 .brand span{font-size:11.5px;color:var(--sub)}
 .grp{font-size:11.5px;color:var(--sub2);padding:14px 9px 5px;letter-spacing:.3px}
@@ -89,8 +110,8 @@ b,strong{font-weight:650}
 .pill{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;padding:4px 11px;border-radius:999px;
   border:1px solid var(--line);background:var(--card);color:var(--sub);white-space:nowrap}
 .pill b{color:var(--fg);font-weight:600}
-.pill.ok{color:var(--green);border-color:rgba(52,199,89,.28);background:var(--green-bg)}
-.dot{width:6px;height:6px;border-radius:50%;background:var(--green-s);box-shadow:0 0 0 3px rgba(52,199,89,.18)}
+.pill.ok{color:var(--green);border-color:var(--green-line);background:var(--green-bg)}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--green-s);box-shadow:0 0 0 3px var(--green-bg)}
 
 .btn{font:inherit;font-size:13px;padding:6px 13px;border-radius:9px;cursor:pointer;border:1px solid var(--line);
   background:var(--card);color:var(--fg);font-weight:500;white-space:nowrap;transition:border-color .15s,background .15s}
@@ -102,7 +123,7 @@ b,strong{font-weight:650}
 .btn:disabled{opacity:.45;cursor:not-allowed}
 
 .card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);
-  backdrop-filter:blur(20px) saturate(1.35);-webkit-backdrop-filter:blur(20px) saturate(1.35);
+  backdrop-filter:var(--glass);-webkit-backdrop-filter:var(--glass);
   box-shadow:var(--shadow);padding:18px 20px;font-size:13.5px;transition:background-color .25s,border-color .25s}
 .ct{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:14px;flex-wrap:wrap}
 .ct h3{font-size:14px;font-weight:640;letter-spacing:-.1px}
@@ -124,7 +145,7 @@ b,strong{font-weight:650}
 .big small{font-size:14px;font-weight:500;color:var(--sub);letter-spacing:0;margin-left:3px}
 .hero .big{font-size:48px}
 .bar{height:6px;border-radius:99px;background:rgba(128,128,128,.16);overflow:hidden}
-.bar i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,var(--green-s),var(--blue))}
+.bar i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,var(--blue),var(--violet))}
 .bar.o i{background:linear-gradient(90deg,var(--orange-s),var(--orange))}
 
 table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
@@ -178,7 +199,7 @@ tbody tr:hover td{background:rgba(128,128,128,.07)}
 /* 图表 */
 .chartbox{position:relative;height:132px;display:flex;align-items:flex-end;gap:3px;padding-top:6px}
 .chartbox i{flex:1;min-width:3px;min-height:2px;border-radius:3px 3px 0 0;
-  background:linear-gradient(180deg,var(--blue),rgba(0,113,227,.32));transition:height .3s;cursor:pointer}
+  background:linear-gradient(180deg,var(--blue),var(--violet));transition:height .3s;cursor:pointer}
 .chartbox i.z{background:rgba(128,128,128,.14)}
 .chartbox i:hover{filter:brightness(1.2)}
 .xax{display:flex;gap:3px;margin-top:7px}
@@ -223,7 +244,7 @@ tbody tr:hover td{background:rgba(128,128,128,.07)}
 .set p{font-size:12px;color:var(--sub);margin-top:1px}
 
 .note{padding:11px 13px;border-radius:var(--r2);font-size:12.5px;color:var(--sub);
-  background:var(--blue-bg);border:1px solid rgba(0,113,227,.14);line-height:1.7}
+  background:var(--blue-bg);border:1px solid var(--blue-line);line-height:1.7}
 .note b{color:var(--fg)}
 .warnbox{background:var(--orange-bg);border-color:rgba(255,149,0,.22)}
 
@@ -326,6 +347,7 @@ tbody tr:hover td{background:rgba(128,128,128,.07)}
 
     <div class="g ghero">
       <div class="card hero">
+        <div class="kpi-ic b"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="2.5" y="6" width="19" height="13.5" rx="3"/><path d="M2.5 10.5h19"/><circle cx="17" cy="14.8" r="1.3" fill="currentColor" stroke="none"/></svg></div>
         <div class="lbl">积分余额</div>
         <div class="big" id="v-remain">—</div>
         <div class="bar mt12"><i id="v-bar" style="width:0%"></i></div>
@@ -336,12 +358,14 @@ tbody tr:hover td{background:rgba(128,128,128,.07)}
         <div class="mt12 fs12 sub" id="v-expire">—</div>
       </div>
       <div class="card">
+        <div class="kpi-ic o"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M13 2.5 5 13.2h5.6L9.6 21.5 18.5 10.3h-5.9L13 2.5z"/></svg></div>
         <div class="lbl">今日消耗</div>
         <div class="big" id="v-today">—</div>
         <div class="kv mt8"><span>请求</span><b id="v-treq">—</b></div>
         <div class="kv"><span>tokens</span><b id="v-ttok">—</b></div>
       </div>
       <div class="card">
+        <div class="kpi-ic g"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="3.5" y="5" width="17" height="15.5" rx="3"/><path d="M8 3v4M16 3v4M3.5 10.5h17"/><path d="M9 15.3l2.1 2.1 4-4.2"/></svg></div>
         <div class="lbl">签到</div>
         <div class="big" id="v-streak">—</div>
         <div class="kv mt8"><span>今日</span><b id="v-checkin">—</b></div>
