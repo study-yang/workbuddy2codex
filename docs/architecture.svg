@@ -1,0 +1,154 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 620" width="1280" height="620" role="img" aria-label="架构图：客户端 → cc-switch → 本地网关 → WorkBuddy 上游，旁边是自建面板">
+  <defs>
+    <linearGradient id="acc" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0a84ff"/>
+      <stop offset="100%" stop-color="#af52de"/>
+    </linearGradient>
+    <marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#b9b6ae"/>
+    </marker>
+    <marker id="ar2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#0071e3"/>
+    </marker>
+    <filter id="sd" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="4" stdDeviation="7" flood-color="#1d1d1f" flood-opacity=".07"/>
+    </filter>
+  </defs>
+
+  <rect width="1280" height="620" fill="#faf9f6"/>
+  <g font-family="-apple-system, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif">
+
+    <!-- 客户端 -->
+    <text x="60" y="52" font-size="12" fill="#a9a9ad" letter-spacing="1.6">客户端</text>
+    <g filter="url(#sd)">
+      <rect x="60" y="70" width="190" height="72" rx="13" fill="#ffffff" stroke="#e6e3dc"/>
+      <circle cx="88" cy="100" r="12" fill="#10a37f"/>
+      <text x="88" y="104" font-size="10" font-weight="700" fill="#fff" text-anchor="middle">CX</text>
+      <text x="110" y="98" font-size="14" font-weight="600" fill="#1d1d1f">Codex</text>
+      <text x="110" y="117" font-size="10.5" fill="#a9a9ad">CLI / 桌面版</text>
+
+      <rect x="60" y="154" width="190" height="72" rx="13" fill="#ffffff" stroke="#e6e3dc"/>
+      <circle cx="88" cy="184" r="12" fill="#d97757"/>
+      <text x="88" y="188" font-size="10" font-weight="700" fill="#fff" text-anchor="middle">CC</text>
+      <text x="110" y="182" font-size="14" font-weight="600" fill="#1d1d1f">Claude Code</text>
+      <text x="110" y="201" font-size="10.5" fill="#a9a9ad">Anthropic CLI</text>
+
+      <rect x="60" y="238" width="190" height="72" rx="13" fill="#ffffff" stroke="#e6e3dc"/>
+      <circle cx="88" cy="268" r="12" fill="#5b6cff"/>
+      <text x="88" y="272" font-size="10" font-weight="700" fill="#fff" text-anchor="middle">DS</text>
+      <text x="110" y="266" font-size="14" font-weight="600" fill="#1d1d1f">DeepSeek Harness</text>
+      <text x="110" y="285" font-size="10.5" fill="#a9a9ad">settings.yaml</text>
+    </g>
+
+    <!-- 箭头 1 -->
+    <line x1="256" y1="190" x2="316" y2="190" stroke="#b9b6ae" stroke-width="1.6" marker-end="url(#ar)"/>
+    <text x="286" y="178" font-size="10" fill="#a9a9ad" text-anchor="middle">切换</text>
+
+    <!-- cc-switch -->
+    <text x="330" y="52" font-size="12" fill="#a9a9ad" letter-spacing="1.6">配置切换</text>
+    <g filter="url(#sd)">
+      <rect x="330" y="70" width="150" height="240" rx="13" fill="#ffffff" stroke="#e6e3dc"/>
+      <text x="350" y="98" font-size="13.5" font-weight="600" fill="#1d1d1f">cc-switch</text>
+      <text x="350" y="115" font-size="10" fill="#a9a9ad">供应商切换器</text>
+      <rect x="346" y="130" width="118" height="26" rx="7" fill="#0071e3" fill-opacity=".1"/>
+      <text x="358" y="147" font-size="11" fill="#0071e3">WB Proxy</text>
+      <rect x="346" y="162" width="118" height="26" rx="7" fill="#f2f0ea"/>
+      <text x="358" y="179" font-size="11" fill="#7c7c80">TinySnow</text>
+      <rect x="346" y="194" width="118" height="26" rx="7" fill="#f2f0ea"/>
+      <text x="358" y="211" font-size="11" fill="#7c7c80">其它中转站</text>
+      <line x1="346" y1="236" x2="464" y2="236" stroke="#eeeae2"/>
+      <text x="350" y="256" font-size="9.5" fill="#a9a9ad">写入 config.toml</text>
+      <text x="350" y="272" font-size="9.5" fill="#a9a9ad">+ auth.json</text>
+      <text x="350" y="292" font-size="9.5" fill="#a9a9ad">+ 模型清单</text>
+    </g>
+
+    <!-- 箭头 2 -->
+    <line x1="486" y1="190" x2="546" y2="190" stroke="#b9b6ae" stroke-width="1.6" marker-end="url(#ar)"/>
+    <text x="516" y="178" font-size="10" fill="#a9a9ad" text-anchor="middle">HTTP</text>
+
+    <!-- 网关大框 -->
+    <text x="560" y="46" font-size="12" fill="#a9a9ad" letter-spacing="1.6">本地网关 · 127.0.0.1:8788</text>
+    <rect x="560" y="58" width="366" height="300" rx="18" fill="#ffffff" fill-opacity=".55" stroke="#dcd8d0" stroke-dasharray="5 5"/>
+
+    <!-- 启动器层 -->
+    <g filter="url(#sd)">
+      <rect x="582" y="80" width="322" height="58" rx="11" fill="#ffffff" stroke="#e6e3dc"/>
+      <rect x="582" y="80" width="4" height="58" rx="2" fill="url(#acc)"/>
+      <text x="602" y="102" font-size="12.5" font-weight="600" fill="#1d1d1f">启动器 run_gateway.py</text>
+      <text x="602" y="121" font-size="10" fill="#7c7c80">运行时注入 · 上游一行不改 · git pull 不冲突</text>
+    </g>
+
+    <!-- 数据层 + 动作层 -->
+    <g filter="url(#sd)">
+      <rect x="582" y="150" width="154" height="86" rx="11" fill="#ffffff" stroke="#e6e3dc"/>
+      <text x="600" y="172" font-size="12" font-weight="600" fill="#1d1d1f">数据层</text>
+      <text x="600" y="190" font-size="9.5" fill="#7c7c80">wb_panel_data.py</text>
+      <text x="600" y="208" font-size="9.5" fill="#a9a9ad">积分 · 账号 · 模型目录</text>
+      <text x="600" y="224" font-size="9.5" fill="#a9a9ad">用量流水 · 调度 · 日志</text>
+
+      <rect x="750" y="150" width="154" height="86" rx="11" fill="#ffffff" stroke="#e6e3dc"/>
+      <text x="768" y="172" font-size="12" font-weight="600" fill="#1d1d1f">动作层</text>
+      <text x="768" y="190" font-size="9.5" fill="#7c7c80">wb_panel_action.py</text>
+      <text x="768" y="208" font-size="9.5" fill="#a9a9ad">白名单动作表</text>
+      <text x="768" y="224" font-size="9.5" fill="#a9a9ad">现签面板令牌后回调</text>
+    </g>
+
+    <!-- 上游网关 -->
+    <g filter="url(#sd)">
+      <rect x="582" y="248" width="322" height="94" rx="11" fill="#ffffff" stroke="#e6e3dc"/>
+      <text x="602" y="270" font-size="12" font-weight="600" fill="#1d1d1f">上游网关 wb_proxy（第三方 · MIT）</text>
+      <text x="602" y="289" font-size="9.5" fill="#7c7c80">/v1/responses · /v1/chat/completions</text>
+      <text x="602" y="306" font-size="9.5" fill="#a9a9ad">账号池 · 积分快照 · 模型目录 · 调度器</text>
+      <text x="602" y="323" font-size="9.5" fill="#a9a9ad">只监听 127.0.0.1，不出本机</text>
+    </g>
+
+    <!-- 箭头 3 -->
+    <line x1="926" y1="190" x2="986" y2="190" stroke="#b9b6ae" stroke-width="1.6" marker-end="url(#ar)"/>
+    <text x="956" y="178" font-size="10" fill="#a9a9ad" text-anchor="middle">HTTPS</text>
+
+    <!-- WorkBuddy 上游 -->
+    <text x="1000" y="52" font-size="12" fill="#a9a9ad" letter-spacing="1.6">上游服务</text>
+    <g filter="url(#sd)">
+      <rect x="1000" y="70" width="220" height="240" rx="13" fill="#ffffff" stroke="#e6e3dc"/>
+      <circle cx="1030" cy="100" r="13" fill="#0071e3" fill-opacity=".12"/>
+      <text x="1030" y="105" font-size="12" fill="#0071e3" text-anchor="middle">WB</text>
+      <text x="1052" y="98" font-size="13.5" font-weight="600" fill="#1d1d1f">WorkBuddy</text>
+      <text x="1052" y="115" font-size="10" fill="#a9a9ad">www.workbuddy.cn</text>
+
+      <text x="1020" y="152" font-size="10.5" fill="#7c7c80">16 个模型 · 实时倍率</text>
+      <text x="1020" y="172" font-size="10.5" fill="#7c7c80">积分余额与积分包</text>
+      <text x="1020" y="192" font-size="10.5" fill="#7c7c80">每日签到 / 活跃奖励</text>
+      <text x="1020" y="212" font-size="10.5" fill="#7c7c80">按 token 计积分</text>
+
+      <rect x="1014" y="234" width="192" height="52" rx="9" fill="#fff8ec" stroke="#f2e3c8"/>
+      <text x="1026" y="253" font-size="9.5" fill="#b25000">用了多少积分，上游说了算</text>
+      <text x="1026" y="270" font-size="9.5" fill="#b25000">本项目只负责把它显示清楚</text>
+    </g>
+
+    <!-- 面板 -->
+    <path d="M891,362 L891,384 L660,384 L660,412" fill="none" stroke="#0071e3" stroke-opacity=".38" stroke-width="1.4" stroke-dasharray="4 4" marker-end="url(#ar2)"/>
+    <text x="676" y="376" font-size="9.5" fill="#0071e3" fill-opacity=".8">读本地状态</text>
+    <g filter="url(#sd)">
+      <rect x="560" y="424" width="660" height="132" rx="13" fill="#ffffff" stroke="#e6e3dc"/>
+      <rect x="560" y="424" width="4" height="132" rx="2" fill="url(#acc)"/>
+      <text x="584" y="452" font-size="14" font-weight="600" fill="#1d1d1f">自建面板 /wb-panel</text>
+      <text x="584" y="472" font-size="10.5" fill="#7c7c80">12 个页签 · 深浅双主题 · 深链 &#35;dash / &#35;log / &#35;agent</text>
+      <g font-size="9.5" fill="#7c7c80">
+        <text x="584" y="500">· 余额 / 今日消耗 / 签到，一屏看完</text>
+        <text x="584" y="520">· 剩余用量估算：按 7 日均耗算还能撑多久</text>
+        <text x="584" y="540">· 工作回溯：近一年每日用量热力图</text>
+        <text x="826" y="500">· 按对话归集消耗（读 Codex 会话对账）</text>
+        <text x="826" y="520">· 积分扣减历史：按积分包看扣了多少</text>
+        <text x="826" y="540">· 按钮全部可执行：刷新 / 测试 / 启停 / 删除</text>
+      </g>
+    </g>
+
+    <text x="60" y="470" font-size="10.5" fill="#a9a9ad">数据流：</text>
+    <text x="60" y="490" font-size="10.5" fill="#7c7c80">Codex 的请求经 cc-switch</text>
+    <text x="60" y="508" font-size="10.5" fill="#7c7c80">指向网关，网关转发到</text>
+    <text x="60" y="526" font-size="10.5" fill="#7c7c80">WorkBuddy，扣的是你</text>
+    <text x="60" y="544" font-size="10.5" fill="#7c7c80">WB 账号的积分。</text>
+    <text x="60" y="572" font-size="10" fill="#a9a9ad">面板只读网关的本地状态，</text>
+    <text x="60" y="588" font-size="10" fill="#a9a9ad">不额外发请求。</text>
+  </g>
+</svg>

@@ -1674,10 +1674,12 @@ document.querySelectorAll('.nav').forEach(function(n){
     try{ history.replaceState(null,'','#'+k); }catch(e){}
   });
 });
-/* 深链：/wb-panel#dash 直接打开数据看板 */
+/* 深链：/wb-panel#dash 直接打开数据看板；?theme=dark 强制深色（截图/分享用） */
 (function(){
   var h=(location.hash||'').replace('#','');
   if(h && document.getElementById('p-'+h)) openPage(h);
+  var m=/[?&]theme=(light|dark)/.exec(location.search||'');
+  if(m) setTheme(m[1]);
 })();
 
 document.querySelectorAll('.sw').forEach(function(s){

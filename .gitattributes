@@ -1,0 +1,7 @@
+# 统一换行：仓库里存 LF，工作区按平台自动转换
+* text=auto eol=lf
+
+# 二进制产物不做行尾转换
+*.png binary
+*.jpg binary
+*.svg text
