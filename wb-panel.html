@@ -188,6 +188,30 @@ tbody tr:hover td{background:rgba(128,128,128,.07)}
 .sw.on{background:var(--green-s)}
 .sw.on::after{left:19px}
 
+
+/* ============ 账号管理 ============ */
+.tb{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-bottom:13px}
+.tb-g{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.tb .sep{width:1px;height:20px;background:var(--line);margin:0 3px;flex:0 0 1px}
+.btn.xs{padding:3px 9px;font-size:12px;border-radius:7px}
+.btn.xs.dgr{padding:3px 8px}
+.acct-tbl td{vertical-align:middle}
+.acct-tbl .c{text-align:center}
+.acct-name{font-size:13.5px;font-weight:640;display:inline-block;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;vertical-align:middle}
+.note-chip{display:inline-block;font-size:11px;padding:1px 7px;border-radius:999px;margin-left:6px;
+  border:1px dashed var(--line);color:var(--sub2);cursor:pointer;vertical-align:middle}
+.note-chip:hover{border-color:var(--blue);color:var(--blue)}
+.acct-meta{font-size:11.5px;color:var(--sub2);margin-top:3px}
+.id-btn-group{display:inline-flex;border:1px solid var(--line);border-radius:7px;overflow:hidden;vertical-align:middle}
+.id-btn{font:inherit;font-size:11px;padding:2px 7px;border:none;background:var(--card2);color:var(--sub);cursor:pointer}
+.id-btn+.id-btn{border-left:1px solid var(--line)}
+.id-btn.on{background:var(--blue);color:#fff;font-weight:600}
+.acct-ops{display:flex;gap:5px;flex-wrap:wrap;align-items:center;justify-content:center}
+.acts{display:flex;gap:5px;flex-wrap:wrap}
+.filters{display:flex;gap:7px;flex-wrap:wrap;align-items:center}
+.sel{font:inherit;font-size:12.5px;padding:4px 9px;border-radius:8px;border:1px solid var(--line);
+  background:var(--card);color:var(--fg2);cursor:pointer}
+
 /* 账号健康快照 */
 .hcards{display:grid;gap:12px;grid-template-columns:repeat(auto-fill,minmax(238px,1fr))}
 .hc{border:1px solid var(--line);border-radius:var(--r2);background:var(--card2);padding:13px 14px}
@@ -377,6 +401,75 @@ tbody tr:hover td{background:rgba(128,128,128,.07)}
       <div class="ct"><h3>账号健康快照</h3><span class="hint" id="acc-hint">—</span></div>
       <div class="hcards" id="acc-cards"></div>
     </div>
+
+<div class="card mt">
+  <div class="ct"><h3>账号管理</h3>
+    <div class="row"><span class="hint" id="acc-tbl-hint">国内版共 1 个 · 启用 1 个</span>
+      <button class="btn xs" data-confirm="将把当前列表（含备注、权重、出站身份）导出为 JSON 文件，凭据以加密形式存放。">导出全部</button></div></div>
+
+  <div class="tb">
+    <div class="tb-g">
+      <button class="btn xs p" data-confirm="打开登录弹窗：浏览器 OAuth 或粘贴 token 两种方式，导入后立即计入账号池。">添加</button>
+      <button class="btn xs" data-confirm="需要 WorkBuddy 桌面端正在运行且已登录；网关会从进程内存回收密钥解开 $wbEncrypted 信封，只读、密钥不落盘。">扫描桌面客户端</button>
+      <button class="btn xs" data-confirm="打开「签到与活跃记录」面板（本页下方），只看签到与每日活跃的流水。">签到记录</button>
+      <button class="btn xs" data-confirm="从此前导出的 JSON 文件恢复账号，重复 uid 会自动跳过。">导入</button>
+      <button class="btn xs" data-confirm="导出全部账号为 JSON（凭据加密存放）。">导出</button>
+    </div>
+    <span class="sep"></span>
+    <div class="tb-g">
+      <button class="btn xs" data-confirm="POST /accounts/credits —— 逐个账号向上游查一次余额，约 1~3 秒。">一键刷新积分</button>
+      <button class="btn xs" data-confirm="POST /accounts/refresh —— 逐个刷新所有账号的上游访问凭证（相当于对每个账号点一次「刷新凭证」）。">一键刷新凭证</button>
+      <button class="btn xs" data-confirm="POST /accounts/test（不带 uid）—— 每个账号各发一条最小请求 + 一条本机连通性测试，能分清「账号坏了」和「本机断网了」，通过后清掉熔断/降权计数。">一键测试</button>
+    </div>
+    <span class="sep"></span>
+    <div class="tb-g">
+      <button class="btn xs" data-confirm="Buddy 加油站签到：领取当日加油奖励，成功 +30~50 积分。">Buddy 加油站签到</button>
+      <button class="btn xs" data-confirm="把尚未绑定出口的已启用账号，依次分配到已启用的代理槽；已有绑定的账号不受影响。">一键分配代理</button>
+      <button class="btn xs" id="btnCycleId" data-confirm="循环切换所有账号的出站身份：WB（桌面客户端）→ VSC（VSCode 插件）→ CLI（命令行）。三者对应不同的出站指纹与配额通道。">一键切换所有出站身份：WB</button>
+    </div>
+    <span class="sep"></span>
+    <div class="tb-g">
+      <button class="btn xs" data-confirm="POST /accounts/set {enabled:true} —— 启用所有账号。">全部启用</button>
+      <button class="btn xs dgr" data-confirm="POST /accounts/set {enabled:false} —— 停用所有账号，停用后请求会失败，确认？">全部停用</button>
+    </div>
+  </div>
+
+  <div class="scroll" style="max-height:none">
+    <table class="acct-tbl" id="t-acc">
+      <thead><tr>
+        <th class="c" style="width:74px">版本</th>
+        <th style="width:210px">账号</th>
+        <th class="c" style="width:76px">状态</th>
+        <th class="c" style="width:150px">今日活动</th>
+        <th class="c" style="width:92px">出口</th>
+        <th class="c" style="width:66px">权重</th>
+        <th style="width:150px">积分</th>
+        <th class="n" style="width:64px">请求</th>
+        <th class="n" style="width:82px">总 token</th>
+        <th class="n" style="width:78px">缓存</th>
+        <th class="c" style="width:236px">操作</th>
+      </tr></thead>
+      <tbody id="t-acc-body"></tbody>
+    </table>
+  </div>
+</div>
+
+<div class="card mt">
+  <div class="ct"><h3>签到与活跃记录</h3>
+    <div class="filters">
+      <select class="sel" id="act-range"><option>今日</option><option selected>近 7 天</option><option>近 30 天</option><option>全部</option></select>
+      <select class="sel" id="act-task"><option>全部任务</option><option>国内版签到</option><option>国际版每日活跃</option></select>
+      <select class="sel" id="act-res"><option>全部结果</option><option>成功</option><option>失败</option></select>
+      <select class="sel" id="act-acct"><option>全部账号</option><option selected>六只羊🐑</option></select>
+      <button class="btn xs" data-confirm="GET /activity/history —— 拉取签到与每日活跃的执行流水。">刷新</button>
+    </div></div>
+  <table>
+    <thead><tr><th style="width:130px">时间</th><th style="width:120px">账号</th><th class="c" style="width:76px">区域</th>
+      <th style="width:130px">任务</th><th class="c" style="width:76px">来源</th><th class="c" style="width:76px">结果</th><th>说明</th></tr></thead>
+    <tbody id="t-act-body"></tbody>
+  </table>
+</div>
+
 
     <div class="g g2 mt">
       <div class="card">
@@ -759,6 +852,21 @@ var DATA = {
     {id:'step-5-preview',rate:0,ctx:1000000,levels:['low','medium','high'],vision:0,tools:1,reason:1,vendor:'s',temp:'1',desc:'阶跃星辰预览，免费'},
     {id:'space-bunny',rate:0.08,ctx:1000000,levels:['low','medium','high','xhigh','max'],vision:1,tools:1,reason:1,vendor:'x',temp:'1',desc:'低价位全能档，倍率仅 0.08'}
   ],
+  accountsTbl:[
+    {uid:'0d184d35-7c2e-4f91-b8a3-9e6d1c5f2a70', nick:'六只羊🐑', note:'', realm:'cn',
+     source:'desktop-app', enabled:true, today:['Buddy 加油站·已领','成长计划·已签到'],
+     exit:'直连', weight:1, remain:2525.81, size:3326, expIn:30, expEnd:'2026-11-16',
+     req:67, tok:'6.99M', cache:'6.28M', product:'workbuddy'}
+  ],
+  activity:[
+    {at:'今日 00:12', acct:'六只羊🐑', realm:'国内版', task:'国内版签到', src:'调度器', ok:true, note:'+100 积分 · 连续第 17 天'},
+    {at:'今日 09:00', acct:'六只羊🐑', realm:'国内版', task:'Buddy 加油站', src:'调度器', ok:true, note:'+30 积分 · 旅行奖励已结算'},
+    {at:'昨日 21:00', acct:'六只羊🐑', realm:'国内版', task:'国内版签到', src:'调度器', ok:true, note:'+100 积分'},
+    {at:'昨日 09:03', acct:'六只羊🐑', realm:'国内版', task:'Token 保活', src:'调度器', ok:true, note:'剩余 29 天，无需刷新'},
+    {at:'10-15 21:00', acct:'六只羊🐑', realm:'国内版', task:'国内版签到', src:'调度器', ok:true, note:'+100 积分 · 连签 7 天奖励 +1000'},
+    {at:'10-14 21:00', acct:'六只羊🐑', realm:'国内版', task:'国内版签到', src:'手动', ok:true, note:'+100 积分'},
+    {at:'10-13 09:00', acct:'六只羊🐑', realm:'国内版', task:'Buddy 加油站', src:'调度器', ok:false, note:'网络超时，已自动重试成功'}
+  ],
   scheduler:{ enabled:true, next:'今日 21:00', last:'今日 09:00 · 签到成功 +100' },
   grants:[
     {name:'CodeBuddy个人版裂变包',at:'2026-10-11',size:300,left:97.89,exp:'2026-11-04',st:'使用中'},
@@ -865,6 +973,94 @@ function renderAccounts(){
   }
   $('acc-cards').innerHTML=h;
 }
+
+
+/* ============ 账号管理表 ============ */
+var ID_CYCLE=['workbuddy','vscode','cli'], ID_NAME={workbuddy:'WB',vscode:'VSC',cli:'CLI'};
+function renderAccountTable(){
+  var rows=DATA.accountsTbl, h='';
+  if(!rows.length){
+    $('t-acc-body').innerHTML='<tr><td colspan="11" class="empty"><span class="ic">○</span>还没有账号。点上方「添加」或「扫描桌面客户端」。</td></tr>';
+    return;
+  }
+  for(var i=0;i<rows.length;i++){
+    var a=rows[i];
+    var soon=a.expIn<=7;
+    h+='<tr>'
+      +'<td class="c"><span class="tg '+(a.realm==='cn'?'b':'')+'">'+(a.realm==='cn'?'国内版':'国际版')+'</span></td>'
+      +'<td><span class="acct-name" title="'+esc(a.nick)+'">'+esc(a.nick)+'</span>'
+      +'<span class="note-chip" data-confirm="账号备注（留空清除；可用来标记「批量」/「自用」）">'+(a.note?esc(a.note):'+ 备注')+'</span>'
+      +'<div class="acct-meta mono">'+esc(a.source)+'：'+esc(a.uid.slice(0,5))+'… · 剩 '+a.expIn+' 天</div></td>'
+      +'<td class="c"><span class="tg '+(a.enabled?'g':'r')+'">'+(a.enabled?'可用':'已停用')+'</span></td>'
+      +'<td class="c"><span class="tags">'+a.today.map(function(t){return '<span class="tg g">'+esc(t)+'</span>';}).join('')+'</span></td>'
+      +'<td class="c"><span class="fs12 sub">'+esc(a.exit)+'</span></td>'
+      +'<td class="c"><select class="sel" style="padding:2px 6px;font-size:12px"><option>1</option><option>2</option><option>3</option></select></td>'
+      +'<td><div class="row b"><b class="v">'+a.remain.toFixed(2)+'</b><span class="fs12 sub">/ '+a.size.toFixed(0)+'</span></div>'
+      +'<div class="fs11 sub'+(soon?' warn':'')+'">'+a.expEnd+' 到期'+(soon?' · 即将过期':'')+'</div></td>'
+      +'<td class="n v">'+a.req+'</td>'
+      +'<td class="n v">'+esc(a.tok)+'</td>'
+      +'<td class="n v">'+esc(a.cache)+'</td>'
+      +'<td class="c"><div class="acct-ops">'
+      +'<div class="acts">'
+      +'<button class="btn xs'+(a.enabled?'':' p')+'" data-confirm="'+(a.enabled?'停用后该账号不再接收请求，确认？':'重新启用该账号。')+'">'+(a.enabled?'停用':'启用')+'</button>'
+      +'<button class="btn xs" data-confirm="POST /accounts/test {uid} —— 对该账号发一条最小请求，同时测本机到上游的连通性。">测试</button>'
+      +'<button class="btn xs" data-confirm="POST /accounts/refresh {uid} —— 刷新该账号的上游访问凭证。">刷新凭证</button>'
+      +'<button class="btn xs" data-confirm="从 Web 控制台同步最新昵称（改名后免重登）。">同步昵称</button>'
+      +'</div>'
+      +'<span class="fs11 sub">出站身份</span>'
+      +'<span class="id-btn-group">'
+      +['workbuddy','vscode','cli'].map(function(p){
+        return '<button class="id-btn'+(a.product===p?' on':'')+'" data-id="'+p+'">'+ID_NAME[p]+'</button>';
+      }).join('')
+      +'</span>'
+      +'<button class="btn xs" data-confirm="导出该账号为 JSON（凭据加密存放）。">导出</button>'
+      +'<button class="btn xs dgr" data-confirm="删除账号「'+esc(a.nick)+'」？只删网关里的记录，不影响 WorkBuddy 账号本身；该账号的凭证会一并抹掉。">删除</button>'
+      +'</div></td></tr>';
+  }
+  $('t-acc-body').innerHTML=h;
+  $('acc-tbl-hint').textContent='国内版共 '+rows.length+' 个 · 启用 '+rows.filter(function(x){return x.enabled;}).length+' 个';
+}
+
+function renderActivity(){
+  var rows=DATA.activity, h='';
+  if(!rows.length){
+    $('t-act-body').innerHTML='<tr><td colspan="7" class="empty"><span class="ic">○</span>所选条件下没有记录。</td></tr>';
+    return;
+  }
+  for(var i=0;i<rows.length;i++){
+    var r=rows[i];
+    h+='<tr><td class="mono fs12">'+esc(r.at)+'</td><td>'+esc(r.acct)+'</td>'
+      +'<td class="c"><span class="tg '+(r.realm==='国内版'?'b':'')+'">'+esc(r.realm)+'</span></td>'
+      +'<td>'+esc(r.task)+'</td>'
+      +'<td class="c fs12 sub">'+esc(r.src)+'</td>'
+      +'<td class="c"><span class="tg '+(r.ok?'g':'r')+'">'+(r.ok?'成功':'失败')+'</span></td>'
+      +'<td class="fs12 sub">'+esc(r.note)+'</td></tr>';
+  }
+  $('t-act-body').innerHTML=h;
+}
+
+/* 出站身份按钮组：点谁切谁 */
+document.addEventListener('click',function(e){
+  var b=e.target&&e.target.closest?e.target.closest('.id-btn'):null;
+  if(!b) return;
+  var grp=b.parentNode;
+  grp.querySelectorAll('.id-btn').forEach(function(x){x.classList.remove('on')});
+  b.classList.add('on');
+  var p=b.getAttribute('data-id');
+  toast('出站身份已切到 '+ID_NAME[p]+'（预览模式，接入后写 /accounts/set {product:"'+p+'"}）');
+});
+
+/* 一键切换所有出站身份：WB → VSC → CLI 循环 */
+(function(){
+  var idx=0, btn=$('btnCycleId');
+  if(!btn) return;
+  btn.addEventListener('click',function(){
+    idx=(idx+1)%3;
+    var p=ID_CYCLE[idx];
+    btn.textContent='一键切换所有出站身份：'+ID_NAME[p];
+    toast('将把全部账号的出站身份切到 '+ID_NAME[p]+'（预览模式）');
+  });
+})();
 
 function renderRecent(){
   var s=sortState.recent, rows=DATA.recent.slice();
@@ -1055,7 +1251,7 @@ function renderLog(){
 }
 
 function renderAll(){
-  renderTop(); renderAccounts(); renderRecent(); renderModels();
+  renderTop(); renderAccounts(); renderAccountTable(); renderActivity(); renderRecent(); renderModels();
   renderChart(); renderKpi(); renderTables(); renderTasks();
   renderClients(); renderConv(); renderLog();
 }
