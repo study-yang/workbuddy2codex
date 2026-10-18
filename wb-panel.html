@@ -380,6 +380,11 @@ tbody tr:hover td{background:rgba(128,128,128,.07)}
     <div class="av">羊</div>
     <div><b>六只羊🐑</b><span id="rail-credits">余额 —</span></div>
   </div>
+  <a class="nav" href="/upstream" target="_blank" rel="noopener"
+     style="margin-top:6px;font-size:12.5px;color:var(--sub2)"
+     title="上游原看板（密码 admin），排查问题时用">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 4h6v6"/><path d="M20 4l-9 9"/><path d="M18 14v5a1 1 0 01-1 1H5a1 1 0 01-1-1V7a1 1 0 011-1h5"/></svg>
+    <span>原看板</span></a>
 </aside>
 
 <main class="main" id="main">
@@ -1680,6 +1685,14 @@ document.querySelectorAll('.nav').forEach(function(n){
   if(h && document.getElementById('p-'+h)) openPage(h);
   var m=/[?&]theme=(light|dark)/.exec(location.search||'');
   if(m) setTheme(m[1]);
+  /* 兼容上游看板的 ?tab= 书签，别让老链接打开是空的 */
+  var t=/[?&]tab=([a-z]+)/.exec(location.search||'');
+  if(t && !h){
+    var MAP={gateway:'gw',accounts:'gw',tasks:'task',dash:'dash',
+             agents:'agent',settings:'set',logs:'log'};
+    var k=MAP[t[1]];
+    if(k && document.getElementById('p-'+k)) openPage(k);
+  }
 })();
 
 document.querySelectorAll('.sw').forEach(function(s){

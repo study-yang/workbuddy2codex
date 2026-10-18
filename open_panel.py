@@ -11,7 +11,7 @@
 这里轮询端口，通了才开浏览器；超过 30 秒就放弃（不弹窗、不报错，免得吵）。
 
 用法：
-    python open_panel.py [--port 8788] [--timeout 30] [--path /wb-panel]
+    python open_panel.py [--port 8788] [--timeout 30] [--path /]
 """
 
 import argparse
@@ -37,7 +37,7 @@ def main(argv=None):
     ap.add_argument("--host", default="127.0.0.1")
     ap.add_argument("--port", type=int, default=8788)
     ap.add_argument("--timeout", type=float, default=30.0)
-    ap.add_argument("--path", default="/wb-panel")
+    ap.add_argument("--path", default="/")
     args = ap.parse_args(argv)
 
     if not wait_port(args.host, args.port, args.timeout):

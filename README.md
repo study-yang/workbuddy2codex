@@ -87,11 +87,13 @@ cd workbuddy2codex
 # 2. 克隆上游网关（本项目不改它任何一行，所以不放进仓库）
 git clone https://github.com/ardeyouxipianyi/workbuddy2api-hub.git gateway
 
-# 3. 起网关（Windows 直接双击 start-gateway.bat 也行）
+# 3. 起网关（Windows 直接双击 启动网关.bat 也行）
 python run_gateway.py --host 127.0.0.1 --port 8788
 ```
 
-启动后面板自动打开：**http://127.0.0.1:8788/wb-panel**
+启动后面板自动打开：**http://127.0.0.1:8788/**（这就是新面板，不用加路径）
+
+> 上游原看板还在：**http://127.0.0.1:8788/upstream**（密码 `admin`），排查问题时用。
 
 第一次进去是空的，去「授权中心 → 扫描桌面客户端」把账号导进来（需要 WorkBuddy 客户端正在运行且已登录）。
 
@@ -114,7 +116,7 @@ python wb2cc.py --write   # 确认无误再写（cc-switch 必须先完全退出
 
 ## 面板
 
-打开 `http://127.0.0.1:8788/wb-panel`。
+打开 `http://127.0.0.1:8788/`。
 
 **12 个页签**：网关与账号 / 任务与福利 / 数据看板 / 智能体配置 / 运行日志 / 设置 / MCP / Skills / 提示词 / 会话 / 授权中心 / 用量统计。
 
@@ -200,12 +202,24 @@ wb_proxy.main()                    # 再正常启动
 | `wb_sessions.py` | 按对话归集积分（命令行版，读 Codex 会话对账） |
 | `wb2cc.py` | 写入 cc-switch：供应商 + 模型清单 + 余额查询脚本 |
 | `open_panel.py` | 等端口通了再开浏览器，避免抢跑 |
-| `start-gateway.bat` | Windows 一键启动 |
+| `启动网关.bat` | Windows 一键启动（**认准这个**，别用 `gateway/` 里的） |
 | `gateway/` | **第三方**（MIT），不进仓库，自行克隆 |
 
 ---
 
 ## 常见问题
+
+<details>
+<summary><b>打开 <code>http://127.0.0.1:8788/</code> 看到的还是旧看板</b></summary>
+
+你起错进程了。
+
+`gateway/` 里有三个上游自带的启动脚本（`start-wb-proxy.bat` / `start-wb-proxy-lan.bat` / `restart-wb-proxy.bat`），它们直接跑 `pythonw wb_proxy.py`，**只起网关本体**。
+
+面板、数据接口、动作接口都是 `run_gateway.py` 在**运行时注入**的。跳过启动器，这些路由根本不存在，`/wb-panel` 直接 404。
+
+正确做法：双击根目录的 **`启动网关.bat`**，或者 `python run_gateway.py`。
+</details>
 
 <details>
 <summary><b>倍率显示 <code>x0.00</code>，或者某个模型不见了</b></summary>

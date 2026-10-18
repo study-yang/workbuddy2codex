@@ -221,10 +221,17 @@ def _install():
             if not _local_ok(self):
                 return self._error(403, "local access only", "invalid_request_error")
             return _send_js(self)
-        if path in (PANEL_PATH, PANEL_PATH + "/", PANEL_PATH + "/index.html"):
+        # 根路径就是新面板。原看板挪到 /upstream，两个都留着。
+        if path in ("/", "/dashboard", "/ui", "/index.html",
+                    PANEL_PATH, PANEL_PATH + "/", PANEL_PATH + "/index.html"):
             if not _local_ok(self):
                 return self._error(403, "local access only", "invalid_request_error")
             return _send_panel(self)
+        if path in ("/upstream", "/upstream/", "/classic", "/classic/"):
+            if not _local_ok(self):
+                return self._error(403, "local access only", "invalid_request_error")
+            self.path = "/"          # 交给上游自己的 dashboard 处理器
+            return orig_do_GET(self)
         if path == PANEL_DATA_PATH:
             if not _local_ok(self):
                 return self._error(403, "local access only", "invalid_request_error")
@@ -277,8 +284,8 @@ def _install():
 
     Handler.do_POST = do_POST
     print("[wbsc] 已注册 %s 与 %s" % (API_PATH, JS_PATH))
-    print("[wbsc] 自建面板：http://127.0.0.1:8788%s （数据 %s · 动作 %s）"
-          % (PANEL_PATH, PANEL_DATA_PATH, PANEL_ACTION_PATH))
+    print("[wbsc] 面板：http://127.0.0.1:8788/   （原看板 /upstream）")
+    print("[wbsc] 数据 %s · 动作 %s" % (PANEL_DATA_PATH, PANEL_ACTION_PATH))
 
 
 def main():
