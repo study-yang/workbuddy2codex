@@ -1,6 +1,10 @@
 # 统一换行：仓库里存 LF，工作区按平台自动转换
 * text=auto eol=lf
 
+# Windows 批处理必须是 CRLF，否则 cmd 解析器可能出错
+*.bat text eol=crlf
+*.cmd text eol=crlf
+
 # 二进制产物不做行尾转换
 *.png binary
 *.jpg binary
